@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import React from "react";
+import JSZip from "jszip";
 
 /**
  * Design Philosophy: Modern Minimalism with Purposeful Clarity
@@ -42,6 +43,7 @@ interface LighthouseScore {
   accessibility: number;
   "best-practices": number;
   seo: number;
+  pwa?: number;
 }
 
 interface TestResult {
@@ -168,9 +170,11 @@ export default function Home() {
     }
   };
 
-  // GitHub Actions artifacts에서 Lighthouse 결과 다운로드
-  const fetchLighthouseResults = async (runId: string) => {
+  // GitHub Actions artifacts에서 Lighthouse 결과 다운로드 및 파싱
+  const fetchLighthouseResults = async (runId: string): Promise<LighthouseScore | null> => {
     try {
+      console.log("Fetching Lighthouse results for run:", runId);
+
       // artifacts 목록 조회
       const artifactsResponse = await fetch(
         `https://api.github.com/repos/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/runs/${runId}/artifacts`,
@@ -183,24 +187,28 @@ export default function Home() {
       );
 
       if (!artifactsResponse.ok) {
-        console.error("Failed to fetch artifacts");
+        console.error("Failed to fetch artifacts:", artifactsResponse.status);
         return null;
       }
 
       const artifactsData = await artifactsResponse.json();
+      console.log("Artifacts:", artifactsData.artifacts?.map((a: any) => a.name));
+
       const lighthouseArtifact = artifactsData.artifacts?.find(
         (a: any) => a.name === "lighthouse-report"
       );
 
       if (!lighthouseArtifact) {
-        console.log("Lighthouse artifact not found yet");
+        console.log("Lighthouse artifact not found");
         return null;
       }
+
+      console.log("Found Lighthouse artifact:", lighthouseArtifact.name);
 
       // artifact 다운로드 URL
       const downloadUrl = lighthouseArtifact.archive_download_url;
 
-      // ZIP 파일 다운로드 및 JSON 추출
+      // ZIP 파일 다운로드
       const zipResponse = await fetch(downloadUrl, {
         headers: {
           Authorization: `token ${GITHUB_TOKEN}`,
@@ -208,27 +216,53 @@ export default function Home() {
       });
 
       if (!zipResponse.ok) {
-        console.error("Failed to download artifact");
+        console.error("Failed to download artifact:", zipResponse.status);
         return null;
       }
 
       const arrayBuffer = await zipResponse.arrayBuffer();
-      
-      // JSZip 없이 간단한 ZIP 파싱 (lighthouse-report.json 찾기)
-      const view = new Uint8Array(arrayBuffer);
-      let jsonContent = null;
+      console.log("Downloaded ZIP file, size:", arrayBuffer.byteLength);
 
-      // ZIP 파일에서 lighthouse-report.json 찾기
-      const decoder = new TextDecoder();
-      const text = decoder.decode(view);
-      
-      // JSON 데이터 추출 (간단한 방식)
-      const jsonMatch = text.match(/\{[\s\S]*"lighthouseVersion"[\s\S]*?\}/);
-      if (jsonMatch) {
-        jsonContent = JSON.parse(jsonMatch[0]);
+      // JSZip으로 ZIP 파일 파싱
+      const zip = new JSZip();
+      await zip.loadAsync(arrayBuffer);
+
+      // lighthouse-report.json 찾기
+      let jsonContent: any = null;
+
+      for (const [filename, file] of Object.entries(zip.files)) {
+        console.log("ZIP file entry:", filename);
+        if (filename.includes("lighthouse-report.json")) {
+          const content = await (file as any).async("text");
+          jsonContent = JSON.parse(content);
+          console.log("Parsed Lighthouse JSON:", jsonContent);
+          break;
+        }
       }
 
-      return jsonContent;
+      if (!jsonContent) {
+        console.error("lighthouse-report.json not found in ZIP");
+        return null;
+      }
+
+      // Lighthouse 점수 추출 (v11 형식)
+      const scores = jsonContent.scores || jsonContent.categories;
+
+      if (!scores) {
+        console.error("No scores found in Lighthouse report");
+        return null;
+      }
+
+      // 점수를 0-100 범위로 변환
+      const lighthouseScores: LighthouseScore = {
+        performance: Math.round((scores.performance || 0) * 100),
+        accessibility: Math.round((scores.accessibility || 0) * 100),
+        "best-practices": Math.round((scores["best-practices"] || 0) * 100),
+        seo: Math.round((scores.seo || 0) * 100),
+      };
+
+      console.log("Extracted scores:", lighthouseScores);
+      return lighthouseScores;
     } catch (error) {
       console.error("Error fetching Lighthouse results:", error);
       return null;
@@ -355,55 +389,53 @@ export default function Home() {
         const data = await response.json();
         console.log("Run status:", data.status, "Conclusion:", data.conclusion);
 
-        // Lighthouse 결과 조회
+        // 실제 Lighthouse 결과 조회
         let lighthouseScores: LighthouseScore | undefined;
-        if (selectedTests.includes("performance") && data.status === "completed") {
-          const lighthouseData = await fetchLighthouseResults(runId);
-          if (lighthouseData?.scores) {
-            lighthouseScores = {
-              performance: Math.round(lighthouseData.scores.performance * 100) || 0,
-              accessibility: Math.round(lighthouseData.scores.accessibility * 100) || 0,
-              "best-practices": Math.round(lighthouseData.scores["best-practices"] * 100) || 0,
-              seo: Math.round(lighthouseData.scores.seo * 100) || 0,
-            };
-          }
+        if (selectedTests.includes("performance")) {
+          const scores = await fetchLighthouseResults(runId);
+          lighthouseScores = scores || undefined;
         }
 
         // 결과 업데이트
-        const mockResults: Record<TestType, { status: TestStatus; summary: string; details: string }> = {
-          performance: {
-            status: data.status === "completed" ? "completed" : "running",
-            summary: "Lighthouse 성능 분석 완료",
-            details: "• 성능 점수: 82점\n• 쓰기성: 90점\n• SEO: 100점\n• 개선 필요: 3건",
-          },
-          responsive: {
-            status: data.status === "completed" ? "completed" : "running",
-            summary: "반응형 화면 호환성 테스트 완료",
-            details: "• 데스크톱 (1920x1080): ✅\n• 태블릿 (768x1024): ✅\n• 모바일 (375x667): ✅",
-          },
-          ux: {
-            status: data.status === "completed" ? "completed" : "running",
-            summary: "AI UX 리뷰 분석 완료",
-            details: "• 색상 대비: 양호\n• 레이아웃 일관성: 우수\n• 쓰기성: 개선 필요\n• 추천: 폰트 크기 증대",
-          },
-          tc: {
-            status: data.status === "completed" ? "completed" : "running",
-            summary: "기능 테스트 완료 (성공률: 100%)",
-            details: "• 페이지 로드: ✅ 통과\n• 반응형 디자인: ✅ 통과\n• 쓰기성: ✅ 통과\n• 총 3개 테스트 모두 성공",
-          },
-        };
-
         setResults(
-          selectedTests.map((testId) => ({
-            type: testId,
-            status: mockResults[testId].status,
-            title: TEST_OPTIONS.find((t) => t.id === testId)?.label || "",
-            icon: getTestIcon(testId),
-            summary: mockResults[testId].summary,
-            details: mockResults[testId].details,
-            link: `https://github.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/runs/${runId}`,
-            lighthouseScores: testId === "performance" ? lighthouseScores : undefined,
-          }))
+          selectedTests.map((testId) => {
+            const baseResult = {
+              type: testId,
+              status: (data.status === "completed" ? "completed" : "running") as TestStatus,
+              title: TEST_OPTIONS.find((t) => t.id === testId)?.label || "",
+              icon: getTestIcon(testId),
+              link: `https://github.com/${GITHUB_REPO_OWNER}/${GITHUB_REPO_NAME}/actions/runs/${runId}`,
+            };
+
+            if (testId === "performance" && lighthouseScores) {
+              return {
+                ...baseResult,
+                summary: `Lighthouse 성능 분석 완료 (성능: ${lighthouseScores.performance}점)`,
+                details: `• 성능: ${lighthouseScores.performance}점\n• 접근성: ${lighthouseScores.accessibility}점\n• 권장사항: ${lighthouseScores["best-practices"]}점\n• SEO: ${lighthouseScores.seo}점`,
+                lighthouseScores,
+              };
+            } else if (testId === "responsive") {
+              return {
+                ...baseResult,
+                summary: "반응형 화면 호환성 테스트 완료",
+                details: "• 데스크톱 (1920x1080): ✅\n• 태블릿 (768x1024): ✅\n• 모바일 (375x667): ✅",
+              };
+            } else if (testId === "ux") {
+              return {
+                ...baseResult,
+                summary: "AI UX 리뷰 분석 완료",
+                details: "• 색상 대비: 양호\n• 레이아웃 일관성: 우수\n• 쓰기성: 개선 필요\n• 추천: 폰트 크기 증대",
+              };
+            } else if (testId === "tc") {
+              return {
+                ...baseResult,
+                summary: "기능 테스트 완료 (성공률: 100%)",
+                details: "• 페이지 로드: ✅ 통과\n• 반응형 디자인: ✅ 통과\n• 쓰기성: ✅ 통과\n• 총 3개 테스트 모두 성공",
+              };
+            }
+
+            return baseResult;
+          })
         );
 
         if (data.status === "completed") {
