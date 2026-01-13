@@ -332,7 +332,7 @@ export default function Home() {
       console.log("Downloading screenshot artifact...");
       const zipResponse = await fetch(screenshotArtifact.archive_download_url, {
         headers: {
-          Authorization: `Bearer ${GITHUB_TOKEN}`,
+          Authorization: `token ${GITHUB_TOKEN}`,
         },
       });
 
