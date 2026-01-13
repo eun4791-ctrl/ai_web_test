@@ -127,7 +127,7 @@ export default function Home() {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${GITHUB_TOKEN}`,
+            Authorization: `token ${GITHUB_TOKEN}`,
             "Content-Type": "application/json",
             Accept: "application/vnd.github.v3+json",
           },
@@ -162,7 +162,7 @@ export default function Home() {
         `https://api.github.com/repos/${GITHUB_REPO}/actions/runs?per_page=1`,
         {
           headers: {
-            Authorization: `Bearer ${GITHUB_TOKEN}`,
+            Authorization: `token ${GITHUB_TOKEN}`,
             Accept: "application/vnd.github.v3+json",
           },
         }
@@ -187,7 +187,7 @@ export default function Home() {
         `https://api.github.com/repos/${GITHUB_REPO}/actions/runs/${id}`,
         {
           headers: {
-            Authorization: `Bearer ${GITHUB_TOKEN}`,
+            Authorization: `token ${GITHUB_TOKEN}`,
             Accept: "application/vnd.github.v3+json",
           },
         }
@@ -211,7 +211,7 @@ export default function Home() {
         `https://api.github.com/repos/${GITHUB_REPO}/actions/runs/${runId}/artifacts`,
         {
           headers: {
-            Authorization: `Bearer ${GITHUB_TOKEN}`,
+            Authorization: `token ${GITHUB_TOKEN}`,
             Accept: "application/vnd.github.v3+json",
           },
         }
