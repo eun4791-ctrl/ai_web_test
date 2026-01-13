@@ -161,7 +161,7 @@ export const appRouter = router({
         runId: z.number(),
         artifactName: z.string(),
       }))
-      .query(async ({ input }) => {
+      .mutation(async ({ input }) => {
         // Use ENV.githubToken instead
         const GITHUB_REPO = "eun4791-ctrl/ai_web_test";
 
@@ -214,7 +214,7 @@ export const appRouter = router({
         base64Data: z.string(),
         fileName: z.string(),
       }))
-      .query(async ({ input }) => {
+      .mutation(async ({ input }) => {
         try {
           // JSZip을 사용하지 않고 간단한 JSON 파싱
           // base64 데이터를 Buffer로 변환
