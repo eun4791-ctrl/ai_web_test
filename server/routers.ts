@@ -249,6 +249,48 @@ export const appRouter = router({
           return { success: false, data: null, error: (error as Error).message };
         }
       }),
+
+    parseScreenshots: publicProcedure
+      .input(z.object({
+        base64Data: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        try {
+          const buffer = Buffer.from(input.base64Data, 'base64');
+          
+          // ZIP 파일 헤더 확인
+          if (buffer[0] === 0x50 && buffer[1] === 0x4B) {
+            const JSZip = (await import('jszip')).default;
+            const zip = new JSZip();
+            await zip.loadAsync(buffer);
+            
+            const screenshots: any = {};
+            
+            for (const [filename, file] of Object.entries(zip.files)) {
+              if (filename.includes('.png')) {
+                const arrayBuf = await (file as any).async("arraybuffer");
+                const base64 = Buffer.from(arrayBuf).toString('base64');
+                const dataUrl = `data:image/png;base64,${base64}`;
+                
+                if (filename.includes('desktop')) {
+                  screenshots.desktop = dataUrl;
+                } else if (filename.includes('tablet')) {
+                  screenshots.tablet = dataUrl;
+                } else if (filename.includes('mobile')) {
+                  screenshots.mobile = dataUrl;
+                }
+              }
+            }
+            
+            return { success: true, data: screenshots, error: null };
+          }
+          
+          return { success: false, data: null, error: "Not a valid ZIP file" };
+        } catch (error) {
+          console.error("Error parsing screenshots:", error);
+          return { success: false, data: null, error: (error as Error).message };
+        }
+      }),
   }),
 });
 

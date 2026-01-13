@@ -227,6 +227,7 @@ export default function Home() {
   const getArtifactsQuery = trpc.qa.getArtifacts.useQuery({ runId: runId || 0 }, { enabled: false });
   const downloadArtifactMutation = trpc.qa.downloadArtifact.useMutation();
   const parseArtifactJsonMutation = trpc.qa.parseArtifactJson.useMutation();
+  const parseScreenshotsMutation = trpc.qa.parseScreenshots.useMutation();
 
   // URL 검증
   const validateUrl = (inputUrl: string): boolean => {
@@ -260,9 +261,16 @@ export default function Home() {
         return null;
       }
 
-      // 스크린샷은 이미지 파일이므로 직접 반환
+      // 스크린샷은 Base64로 변환
       if (artifactName === "responsive-screenshots") {
-        return downloadResult.data;
+        const parseResult = await parseScreenshotsMutation.mutateAsync({
+          base64Data: downloadResult.data,
+        });
+        if (!parseResult.success) {
+          console.error(`Failed to parse screenshots:`, parseResult.error);
+          return null;
+        }
+        return parseResult.data;
       }
 
       const parseResult = await parseArtifactJsonMutation.mutateAsync({
@@ -563,9 +571,46 @@ export default function Home() {
                           <span>스크린샷 캡처 중...</span>
                         </div>
                       ) : results.find((r) => r.testId === "responsive")?.data ? (
-                        <div className="text-center py-8 text-gray-500">
-                          <p>스크린샷 데이터가 준비 중입니다</p>
-                        </div>
+                        <Tabs defaultValue="desktop" className="w-full">
+                          <TabsList className="grid w-full grid-cols-3">
+                            <TabsTrigger value="desktop">💻 데스크톱</TabsTrigger>
+                            <TabsTrigger value="tablet">📱 태블릿</TabsTrigger>
+                            <TabsTrigger value="mobile">📲 모바일</TabsTrigger>
+                          </TabsList>
+                          <TabsContent value="desktop" className="mt-4">
+                            {results.find((r) => r.testId === "responsive")?.data?.desktop ? (
+                              <img
+                                src={results.find((r) => r.testId === "responsive")?.data?.desktop}
+                                alt="Desktop screenshot"
+                                className="w-full border rounded-lg"
+                              />
+                            ) : (
+                              <div className="text-center py-8 text-gray-500">스크린샷 없음</div>
+                            )}
+                          </TabsContent>
+                          <TabsContent value="tablet" className="mt-4">
+                            {results.find((r) => r.testId === "responsive")?.data?.tablet ? (
+                              <img
+                                src={results.find((r) => r.testId === "responsive")?.data?.tablet}
+                                alt="Tablet screenshot"
+                                className="w-full border rounded-lg"
+                              />
+                            ) : (
+                              <div className="text-center py-8 text-gray-500">스크린샷 없음</div>
+                            )}
+                          </TabsContent>
+                          <TabsContent value="mobile" className="mt-4">
+                            {results.find((r) => r.testId === "responsive")?.data?.mobile ? (
+                              <img
+                                src={results.find((r) => r.testId === "responsive")?.data?.mobile}
+                                alt="Mobile screenshot"
+                                className="w-full border rounded-lg"
+                              />
+                            ) : (
+                              <div className="text-center py-8 text-gray-500">스크린샷 없음</div>
+                            )}
+                          </TabsContent>
+                        </Tabs>
                       ) : (
                         <div className="text-center py-8 text-gray-500">
                           <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
