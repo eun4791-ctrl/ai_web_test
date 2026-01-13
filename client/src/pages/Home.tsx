@@ -100,9 +100,12 @@ const getScoreBgColor = (score: number): string => {
 
 // Lighthouse 점수 원형 차트
 const ScoreCircle = ({ score, label }: { score: number; label: string }) => {
+  // NaN 체크
+  const validScore = isNaN(score) ? 0 : Math.min(100, Math.max(0, score));
+  
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (score / 100) * circumference;
+  const offset = circumference - (validScore / 100) * circumference;
 
   return (
     <div className="flex flex-col items-center">
@@ -121,24 +124,24 @@ const ScoreCircle = ({ score, label }: { score: number; label: string }) => {
             cy="50"
             r={radius}
             fill="none"
-            stroke={score >= 90 ? "#10b981" : score >= 50 ? "#f59e0b" : "#ef4444"}
+            stroke={validScore >= 90 ? "#10b981" : validScore >= 50 ? "#f59e0b" : "#ef4444"}
             strokeWidth="4"
             strokeDasharray={circumference}
-            strokeDashoffset={offset}
+            strokeDashoffset={isNaN(offset) ? 0 : offset}
             strokeLinecap="round"
             className="transition-all duration-500"
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className={`text-2xl font-bold ${getScoreColor(score)}`}>
-            {score}
+          <span className={`text-2xl font-bold ${getScoreColor(validScore)}`}>
+            {validScore}
           </span>
         </div>
       </div>
       <p className="mt-2 text-sm font-medium text-gray-700">{label}</p>
     </div>
   );
-};
+}
 
 export default function Home() {
   const [url, setUrl] = React.useState("");
@@ -245,21 +248,38 @@ export default function Home() {
         return null;
       }
 
-      // Lighthouse 점수 추출 (v11 형식)
-      const scores = jsonContent.scores || jsonContent.categories;
+      console.log("Full Lighthouse JSON structure:", JSON.stringify(jsonContent, null, 2).substring(0, 500));
 
-      if (!scores) {
-        console.error("No scores found in Lighthouse report");
-        return null;
+      // Lighthouse 점수 추출
+      let lighthouseScores: LighthouseScore = {
+        performance: 0,
+        accessibility: 0,
+        "best-practices": 0,
+        seo: 0,
+      };
+
+      // v11 형식: categories 객체 내에 각 카테고리의 score 필드
+      if (jsonContent.categories) {
+        const categories = jsonContent.categories;
+        lighthouseScores.performance = Math.round((categories.performance?.score || 0) * 100);
+        lighthouseScores.accessibility = Math.round((categories.accessibility?.score || 0) * 100);
+        lighthouseScores["best-practices"] = Math.round((categories["best-practices"]?.score || 0) * 100);
+        lighthouseScores.seo = Math.round((categories.seo?.score || 0) * 100);
+      }
+      // v10 이하 형식: scores 객체 직접 사용
+      else if (jsonContent.scores) {
+        const scores = jsonContent.scores;
+        lighthouseScores.performance = Math.round((scores.performance || 0) * 100);
+        lighthouseScores.accessibility = Math.round((scores.accessibility || 0) * 100);
+        lighthouseScores["best-practices"] = Math.round((scores["best-practices"] || 0) * 100);
+        lighthouseScores.seo = Math.round((scores.seo || 0) * 100);
       }
 
-      // 점수를 0-100 범위로 변환
-      const lighthouseScores: LighthouseScore = {
-        performance: Math.round((scores.performance || 0) * 100),
-        accessibility: Math.round((scores.accessibility || 0) * 100),
-        "best-practices": Math.round((scores["best-practices"] || 0) * 100),
-        seo: Math.round((scores.seo || 0) * 100),
-      };
+      // 유효성 검증
+      if (isNaN(lighthouseScores.performance)) lighthouseScores.performance = 0;
+      if (isNaN(lighthouseScores.accessibility)) lighthouseScores.accessibility = 0;
+      if (isNaN(lighthouseScores["best-practices"])) lighthouseScores["best-practices"] = 0;
+      if (isNaN(lighthouseScores.seo)) lighthouseScores.seo = 0;
 
       console.log("Extracted scores:", lighthouseScores);
       return lighthouseScores;
