@@ -155,6 +155,100 @@ export const appRouter = router({
           throw error;
         }
       }),
+
+    downloadArtifact: publicProcedure
+      .input(z.object({ 
+        runId: z.number(),
+        artifactName: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+        const GITHUB_REPO = "eun4791-ctrl/ai_web_test";
+
+        if (!GITHUB_TOKEN) {
+          throw new Error("GitHub token not configured");
+        }
+
+        try {
+          // Artifacts 목록 조회
+          const artifactsResponse = await fetch(
+            `https://api.github.com/repos/${GITHUB_REPO}/actions/runs/${input.runId}/artifacts`,
+            {
+              headers: {
+                Authorization: `token ${GITHUB_TOKEN}`,
+                Accept: "application/vnd.github.v3+json",
+              },
+            }
+          );
+
+          if (!artifactsResponse.ok) throw new Error("Failed to fetch artifacts");
+
+          const artifactsData = await artifactsResponse.json();
+          const artifact = artifactsData.artifacts?.find((a: any) => a.name === input.artifactName);
+
+          if (!artifact) {
+            return { success: false, data: null, error: `Artifact ${input.artifactName} not found` };
+          }
+
+          // Artifact 다운로드
+          const downloadResponse = await fetch(artifact.archive_download_url, {
+            headers: {
+              Authorization: `token ${GITHUB_TOKEN}`,
+            },
+          });
+
+          if (!downloadResponse.ok) throw new Error("Failed to download artifact");
+
+          const arrayBuffer = await downloadResponse.arrayBuffer();
+          const base64 = Buffer.from(arrayBuffer).toString('base64');
+
+          return { success: true, data: base64, error: null };
+        } catch (error) {
+          console.error("Error downloading artifact:", error);
+          return { success: false, data: null, error: (error as Error).message };
+        }
+      }),
+
+    parseArtifactJson: publicProcedure
+      .input(z.object({
+        base64Data: z.string(),
+        fileName: z.string(),
+      }))
+      .query(async ({ input }) => {
+        try {
+          // JSZip을 사용하지 않고 간단한 JSON 파싱
+          // base64 데이터를 Buffer로 변환
+          const buffer = Buffer.from(input.base64Data, 'base64');
+          
+          // ZIP 파일 헤더 확인
+          if (buffer[0] === 0x50 && buffer[1] === 0x4B) {
+            // ZIP 파일이면 동적으로 JSZip 로드
+            const JSZip = (await import('jszip')).default;
+            const zip = new JSZip();
+            await zip.loadAsync(buffer);
+            
+            // JSON 파일 찾기
+            let jsonContent: any = null;
+            for (const [filename, file] of Object.entries(zip.files)) {
+              if (filename.includes(input.fileName)) {
+                const content = await (file as any).async("text");
+                jsonContent = JSON.parse(content);
+                break;
+              }
+            }
+            
+            return { success: true, data: jsonContent, error: null };
+          } else {
+            // 직접 JSON 파싱 시도
+            const text = buffer.toString('utf-8');
+            const data = JSON.parse(text);
+            return { success: true, data, error: null };
+          }
+        } catch (error) {
+          console.error("Error parsing artifact:", error);
+          return { success: false, data: null, error: (error as Error).message };
+        }
+      }),
   }),
 });
 
