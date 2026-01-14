@@ -42,13 +42,15 @@ jobs:
       - name: Run Lighthouse Performance Test
         if: contains(github.event.inputs.tests, 'performance')
         run: |
+          mkdir -p reports
           npm install -g lighthouse
-          lighthouse ${{ github.event.inputs.target_url }} --output=json --output-path=./lighthouse-report.json || true
-          lighthouse ${{ github.event.inputs.target_url }} --output=html --output-path=./lighthouse-report.html || true
+          lighthouse ${{ github.event.inputs.target_url }} --output=json --output-path=./reports/lighthouse-report.json || true
+          lighthouse ${{ github.event.inputs.target_url }} --output=html --output-path=./reports/lighthouse-report.html || true
 
       - name: Run Responsive Screenshot Test
         if: contains(github.event.inputs.tests, 'responsive')
         run: |
+          mkdir -p screenshots
           cat > screenshot.js << 'EOF'
           const { chromium } = require('playwright');
           
@@ -61,15 +63,15 @@ jobs:
             
             // Desktop
             await page.setViewportSize({ width: 1920, height: 1080 });
-            await page.screenshot({ path: 'desktop.png' });
+            await page.screenshot({ path: 'screenshots/desktop.png' });
             
             // Tablet
             await page.setViewportSize({ width: 768, height: 1024 });
-            await page.screenshot({ path: 'tablet.png' });
+            await page.screenshot({ path: 'screenshots/tablet.png' });
             
             // Mobile
             await page.setViewportSize({ width: 375, height: 667 });
-            await page.screenshot({ path: 'mobile.png' });
+            await page.screenshot({ path: 'screenshots/mobile.png' });
             
             await browser.close();
           })();
@@ -90,15 +92,21 @@ jobs:
           (async () => {
             const browser = await chromium.launch();
             const page = await browser.newPage();
+            const targetUrl = '${{ github.event.inputs.target_url }}';
             
             // 페이지 로드
-            await page.goto('${{ github.event.inputs.target_url }}', { waitUntil: 'networkidle' });
+            await page.goto(targetUrl, { waitUntil: 'networkidle' });
             await page.waitForTimeout(2000); // 추가 로딩 대기
             
             // 스크린샷 캡처 (Desktop)
             await page.setViewportSize({ width: 1920, height: 1080 });
             const screenshotPath = 'ux-review-screenshot.png';
             await page.screenshot({ path: screenshotPath });
+            
+            // reports 디렉토리 생성
+            if (!fs.existsSync('reports')) {
+              fs.mkdirSync('reports', { recursive: true });
+            }
             
             // 스크린샷을 Base64로 변환
             const imageBuffer = fs.readFileSync(screenshotPath);
@@ -182,10 +190,13 @@ jobs:
                   const content = response.choices[0].message.content;
                   const jsonMatch = content.match(/\{[\s\S]*\}/);
                   const result = jsonMatch ? JSON.parse(jsonMatch[0]) : { reviews: [] };
-                  fs.writeFileSync('ux-report.json', JSON.stringify(result, null, 2));
+                  result.url = targetUrl;
+                  result.timestamp = new Date().toISOString();
+                  fs.writeFileSync('reports/ux-report.json', JSON.stringify(result, null, 2));
+                  console.log('UX Review saved:', result);
                 } catch (e) {
                   console.error('Error parsing response:', e);
-                  fs.writeFileSync('ux-report.json', JSON.stringify({ reviews: [] }, null, 2));
+                  fs.writeFileSync('reports/ux-report.json', JSON.stringify({ reviews: [] }, null, 2));
                 }
                 await browser.close();
               });
@@ -193,7 +204,7 @@ jobs:
             
             req.on('error', (e) => {
               console.error('API Error:', e);
-              fs.writeFileSync('ux-report.json', JSON.stringify({ reviews: [] }, null, 2));
+              fs.writeFileSync('reports/ux-report.json', JSON.stringify({ reviews: [] }, null, 2));
             });
             
             req.write(requestData);
@@ -202,7 +213,8 @@ jobs:
           EOF
           npm install playwright
           node ux-review.js
-          sleep 5  # API 응답 대기
+          sleep 10  # API 응답 대기
+          ls -la reports/ || echo 'reports directory not found'  # 디버깅
 
       - name: Run Test Cases
         if: contains(github.event.inputs.tests, 'tc')
@@ -231,7 +243,8 @@ jobs:
             await browser.close();
           })();
           EOF
-          node test-cases.js > tc-report.json
+          mkdir -p reports
+          node test-cases.js > reports/tc-report.json
 
       - name: Upload Lighthouse Report
         if: contains(github.event.inputs.tests, 'performance')
@@ -239,8 +252,8 @@ jobs:
         with:
           name: lighthouse-report
           path: |
-            lighthouse-report.json
-            lighthouse-report.html
+            reports/lighthouse-report.json
+            reports/lighthouse-report.html
 
       - name: Upload Screenshots
         if: contains(github.event.inputs.tests, 'responsive')
@@ -248,23 +261,23 @@ jobs:
         with:
           name: responsive-screenshots
           path: |
-            desktop.png
-            tablet.png
-            mobile.png
+            screenshots/desktop.png
+            screenshots/tablet.png
+            screenshots/mobile.png
 
       - name: Upload UX Review
         if: contains(github.event.inputs.tests, 'ux')
         uses: actions/upload-artifact@v4
         with:
           name: ux-review
-          path: ux-report.json
+          path: reports/ux-report.json
 
       - name: Upload Test Cases Report
         if: contains(github.event.inputs.tests, 'tc')
         uses: actions/upload-artifact@v4
         with:
           name: test-cases-report
-          path: tc-report.json
+          path: reports/tc-report.json
 
       - name: Create Summary
         run: |
