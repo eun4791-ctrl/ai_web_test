@@ -57,13 +57,14 @@ jobs:
         if: contains(github.event.inputs.tests, 'responsive')
         continue-on-error: true
         run: |
+          npm install playwright
           npx playwright install chromium
 
       - name: Generate Screenshots with Playwright
         if: contains(github.event.inputs.tests, 'responsive')
         continue-on-error: true
         run: |
-          cat > screenshot.mjs << 'SCRIPT'
+          cat > screenshot.mjs << 'SCRIPT_END'
           import { chromium } from 'playwright';
           import fs from 'fs';
           import path from 'path';
@@ -122,7 +123,7 @@ jobs:
               }
             }
           })();
-          SCRIPT
+          SCRIPT_END
           
           node screenshot.mjs
 
@@ -135,7 +136,7 @@ jobs:
           
           if [ ! -f screenshots/desktop.png ] || [ ! -f screenshots/tablet.png ] || [ ! -f screenshots/mobile.png ]; then
             echo "Creating fallback screenshots..."
-            python3 << 'PYTHON'
+            python3 << 'PYTHON_END'
           import struct
           import zlib
           
@@ -165,7 +166,7 @@ jobs:
           create_png(768, 1024, 200, 200, 200, 'screenshots/tablet.png')
           create_png(375, 667, 200, 200, 200, 'screenshots/mobile.png')
           print("✓ Fallback screenshots created")
-            PYTHON
+          PYTHON_END
           fi
           
           ls -lh screenshots/
@@ -174,7 +175,7 @@ jobs:
       - name: Generate AI UX Review
         if: contains(github.event.inputs.tests, 'ux')
         run: |
-          cat > ux-review.mjs << 'SCRIPT'
+          cat > ux-review.mjs << 'SCRIPT_END'
           import fs from 'fs';
           import path from 'path';
           
@@ -231,7 +232,7 @@ jobs:
             console.error('❌ Error writing UX review:', error.message);
             process.exit(1);
           }
-          SCRIPT
+          SCRIPT_END
           
           node ux-review.mjs
 
@@ -239,9 +240,10 @@ jobs:
       - name: Generate and Run Test Cases
         if: contains(github.event.inputs.tests, 'tc')
         run: |
+          npm install playwright
           npx playwright install chromium
           
-          cat > test-cases.mjs << 'SCRIPT'
+          cat > test-cases.mjs << 'SCRIPT_END'
           import { chromium } from 'playwright';
           import fs from 'fs';
           import path from 'path';
@@ -410,7 +412,7 @@ jobs:
               }
             }
           })();
-          SCRIPT
+          SCRIPT_END
           
           node test-cases.mjs
 
