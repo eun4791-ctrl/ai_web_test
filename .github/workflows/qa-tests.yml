@@ -79,29 +79,130 @@ jobs:
 
       - name: Run AI UX Review
         if: contains(github.event.inputs.tests, 'ux')
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           cat > ux-review.js << 'EOF'
           const { chromium } = require('playwright');
+          const fs = require('fs');
+          const https = require('https');
           
           (async () => {
             const browser = await chromium.launch();
             const page = await browser.newPage();
             
+            // 페이지 로드
             await page.goto('${{ github.event.inputs.target_url }}', { waitUntil: 'networkidle' });
+            await page.waitForTimeout(2000); // 추가 로딩 대기
             
-            // Basic UX analysis
-            const analysis = {
-              cta_visibility: 'low',
-              font_contrast: 'insufficient',
-              layout_consistency: 'good',
-              mobile_friendly: 'yes'
+            // 스크린샷 캡처 (Desktop)
+            await page.setViewportSize({ width: 1920, height: 1080 });
+            const screenshotPath = 'ux-review-screenshot.png';
+            await page.screenshot({ path: screenshotPath });
+            
+            // 스크린샷을 Base64로 변환
+            const imageBuffer = fs.readFileSync(screenshotPath);
+            const base64Image = imageBuffer.toString('base64');
+            
+            // ChatGPT API 호출
+            const apiKey = process.env.OPENAI_API_KEY;
+            if (!apiKey) {
+              console.error('OPENAI_API_KEY not set');
+              fs.writeFileSync('ux-report.json', JSON.stringify({ reviews: [] }, null, 2));
+              await browser.close();
+              return;
+            }
+            
+            const requestData = JSON.stringify({
+              model: 'gpt-4-vision',
+              messages: [
+                {
+                  role: 'user',
+                  content: [
+                    {
+                      type: 'text',
+                      text: `당신은 UX 전문가입니다. 다음 웹사이트 스크린샷을 분석하고 UX 리뷰를 제공해주세요.
+
+[리뷰 기준]
+- "생각 안 하고 써도 되나?" 관점
+- 사용 중 멈추거나 다시 생각하게 되는 순간
+
+[리뷰 항목]
+1. 첫 화면에서 이해되는 것 / 안 되는 것
+2. 다음 행동이 자연스럽게 보이는가?
+3. 용어, 버튼, 문구에서 헷갈리는 부분
+4. 실수했을 때 UX(되돌리기, 안내, 피드백)
+5. 사용자 기준 불편 포인트
+
+[출력 형식]
+정확히 5개의 리뷰를 다음 JSON 형식으로 반환해주세요:
+{
+  "reviews": [
+    {
+      "priority": "상/중/하",
+      "issue": "사용자 시점의 문제점",
+      "cause": "UX 이유",
+      "suggestion": "디자인/문구/플로우 기준 개선 제안"
+    }
+  ]
+}
+
+반드시 유효한 JSON만 반환하세요.`
+                    },
+                    {
+                      type: 'image_url',
+                      image_url: {
+                        url: 'data:image/png;base64,' + base64Image,
+                        detail: 'high'
+                      }
+                    }
+                  ]
+                }
+              ],
+              max_tokens: 2000
+            });
+            
+            const options = {
+              hostname: 'api.openai.com',
+              path: '/v1/chat/completions',
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + apiKey,
+                'Content-Length': Buffer.byteLength(requestData)
+              }
             };
             
-            console.log(JSON.stringify(analysis, null, 2));
-            await browser.close();
+            const req = https.request(options, (res) => {
+              let data = '';
+              res.on('data', (chunk) => { data += chunk; });
+              res.on('end', async () => {
+                try {
+                  const response = JSON.parse(data);
+                  const content = response.choices[0].message.content;
+                  const jsonMatch = content.match(/\{[\s\S]*\}/);
+                  const result = jsonMatch ? JSON.parse(jsonMatch[0]) : { reviews: [] };
+                  fs.writeFileSync('ux-report.json', JSON.stringify(result, null, 2));
+                } catch (e) {
+                  console.error('Error parsing response:', e);
+                  fs.writeFileSync('ux-report.json', JSON.stringify({ reviews: [] }, null, 2));
+                }
+                await browser.close();
+              });
+            });
+            
+            req.on('error', (e) => {
+              console.error('API Error:', e);
+              fs.writeFileSync('ux-report.json', JSON.stringify({ reviews: [] }, null, 2));
+            });
+            
+            req.write(requestData);
+            req.end();
           })();
           EOF
-          node ux-review.js > ux-report.json
+          npm install playwright
+          node ux-review.js
+          sleep 5  # API 응답 대기
 
       - name: Run Test Cases
         if: contains(github.event.inputs.tests, 'tc')
