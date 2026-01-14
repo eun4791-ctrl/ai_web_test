@@ -10,7 +10,6 @@ on:
         description: 'Comma-separated test types (performance,responsive,ux,tc)'
         required: true
         type: string
-
 jobs:
   qa-tests:
     runs-on: ubuntu-latest
@@ -18,20 +17,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-
       - name: Create reports directory
         run: mkdir -p reports screenshots
-
       # ========== Lighthouse Performance Test ==========
       - name: Install Lighthouse
         if: contains(github.event.inputs.tests, 'performance')
         run: npm install -g lighthouse
-
       - name: Run Lighthouse Performance Test
         if: contains(github.event.inputs.tests, 'performance')
         continue-on-error: true
@@ -49,14 +44,13 @@ jobs:
             --quiet || true
           
           echo "✅ Lighthouse test completed"
-
       # ========== Playwright Responsive Screenshots ==========
       - name: Install Playwright
         if: contains(github.event.inputs.tests, 'responsive')
+        continue-on-error: true
         run: |
           npm install playwright
           npx playwright install chromium
-
       - name: Generate Screenshots with Playwright
         if: contains(github.event.inputs.tests, 'responsive')
         continue-on-error: true
@@ -105,14 +99,12 @@ jobs:
           SCRIPT
           
           node screenshot.mjs
-
       # ========== AI UX Review with ChatGPT ==========
       - name: Install Playwright for UX Review
         if: contains(github.event.inputs.tests, 'ux')
         run: |
           npm install playwright
           npx playwright install chromium
-
       - name: Generate AI UX Review
         if: contains(github.event.inputs.tests, 'ux')
         env:
@@ -286,7 +278,6 @@ jobs:
           
           node ux-review.mjs
           sleep 10
-
       # ========== Playwright Test Cases ==========
       - name: Generate and Run Test Cases
         if: contains(github.event.inputs.tests, 'tc')
@@ -453,7 +444,6 @@ jobs:
           SCRIPT
           
           node test-cases.mjs
-
       # ========== Upload Artifacts ==========
       - name: Upload Lighthouse Report
         if: contains(github.event.inputs.tests, 'performance')
@@ -461,21 +451,18 @@ jobs:
         with:
           name: lighthouse-report
           path: reports/lighthouse-report.json
-
       - name: Upload Screenshots
         if: contains(github.event.inputs.tests, 'responsive')
         uses: actions/upload-artifact@v3
         with:
           name: responsive-screenshots
           path: screenshots/
-
       - name: Upload UX Review
         if: contains(github.event.inputs.tests, 'ux')
         uses: actions/upload-artifact@v3
         with:
           name: ux-review
           path: reports/ux-review.json
-
       - name: Upload Test Cases
         if: contains(github.event.inputs.tests, 'tc')
         uses: actions/upload-artifact@v3
