@@ -90,12 +90,41 @@ jobs:
         run: |
           cat << 'EOF' > reports/ux-review.json
           {
-            "url": "${{ github.event.inputs.target_url }}",
-            "score": 7.3,
-            "issues": [
-              { "priority": "상", "issue": "CTA 가시성 부족" },
-              { "priority": "중", "issue": "로딩 상태 표시 없음" }
-            ]
+           "url": "${{ github.event.inputs.target_url }}",
+           "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%S.%3NZ")",
+           "reviews": [
+            {
+              "priority": "상",
+              "issue": "첫 화면에서 주요 기능이 명확하지 않음",
+              "cause": "CTA 버튼의 텍스트가 모호하고 배치가 눈에 띄지 않음",
+              "suggestion": "주요 CTA 버튼을 더 크고 명확하게 디자인하고, 문구를 더 구체적으로 변경"
+            },
+            {
+              "priority": "상",
+              "issue": "입력 오류 시 피드백이 부족함",
+              "cause": "유효성 검사 실패 시 사용자에게 어떤 문제인지 명확하게 알려주지 않음",
+              "suggestion": "입력 필드 하단에 구체적인 오류 메시지 표시 (예: '유효한 URL을 입력하세요')"
+            },
+            {
+              "priority": "중",
+              "issue": "로딩 상태 표시가 불명확함",
+              "cause": "처리 중임을 명확하게 알려주는 UI 요소가 없음",
+              "suggestion": "로딩 스피너 또는 단계별 진행 상태 표시 추가"
+            },
+            {
+              "priority": "중",
+              "issue": "결과 화면이 길어 스크롤 부담이 큼",
+              "cause": "모든 결과를 한 페이지에 나열함",
+              "suggestion": "탭 또는 아코디언 UI로 영역 분리"
+            },
+            {
+              "priority": "하",
+              "issue": "모바일에서 버튼 크기가 작음",
+              "cause": "터치 타겟 크기가 권장 기준보다 작음",
+              "suggestion": "모바일 버튼 크기를 최소 48x48px 이상으로 확장"
+            }
+          ],
+          "score": 7.2
           }
           EOF
 
