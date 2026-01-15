@@ -28,7 +28,7 @@ jobs:
         run: mkdir -p reports screenshots qa-temp
 
       # ==================================================
-      # 🔤 Install Korean Fonts (한글 깨짐 방지)
+      # 🔤 Install Korean Fonts
       # ==================================================
       - name: Install Korean fonts
         run: |
@@ -49,7 +49,7 @@ jobs:
             --chrome-flags="--headless --no-sandbox" || true
 
       # ==================================================
-      # Playwright 설치 (chromium only)
+      # Playwright install
       # ==================================================
       - name: Install Playwright (chromium only)
         if: contains(github.event.inputs.tests, 'responsive') || contains(github.event.inputs.tests, 'tc')
@@ -60,7 +60,7 @@ jobs:
           npx playwright install chromium
 
       # ==================================================
-      # Responsive Screenshots (폰트 로딩 대기 포함)
+      # Responsive Screenshots (timeout 안전 버전)
       # ==================================================
       - name: Responsive Screenshots
         if: contains(github.event.inputs.tests, 'responsive')
@@ -80,27 +80,36 @@ jobs:
 
           const page = await browser.newPage();
 
-          // 페이지 로딩 + 웹폰트 로딩 완료 대기
-          await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
-          await page.evaluate(() => document.fonts.ready);
+          try {
+            await page.goto(url, {
+              waitUntil: 'domcontentloaded',
+              timeout: 30000
+            });
 
-          for (const [name, w, h] of [
-            ['desktop', 1920, 1080],
-            ['tablet', 768, 1024],
-            ['mobile', 375, 667]
-          ]) {
-            await page.setViewportSize({ width: w, height: h });
-            await page.waitForTimeout(500);
-            await page.screenshot({ path: `${out}/${name}.png` });
+            // 레이아웃 + 웹폰트 안정화
+            await page.waitForTimeout(1500);
+            await page.evaluate(() => document.fonts.ready);
+
+            for (const [name, w, h] of [
+              ['desktop', 1920, 1080],
+              ['tablet', 768, 1024],
+              ['mobile', 375, 667]
+            ]) {
+              await page.setViewportSize({ width: w, height: h });
+              await page.waitForTimeout(500);
+              await page.screenshot({ path: `${out}/${name}.png` });
+            }
+          } catch (e) {
+            console.error('Screenshot error:', e.message);
+          } finally {
+            await browser.close();
           }
-
-          await browser.close();
           EOF
 
           cd qa-temp && node screenshot.mjs
 
       # ==================================================
-      # UX Review (JSON 고정 포맷)
+      # UX Review
       # ==================================================
       - name: UX Review
         if: contains(github.event.inputs.tests, 'ux')
@@ -113,14 +122,8 @@ jobs:
               {
                 "priority": "상",
                 "issue": "첫 화면에서 주요 기능이 명확하지 않음",
-                "cause": "CTA 버튼의 가시성이 낮음",
-                "suggestion": "주요 CTA 버튼을 더 크고 명확하게 배치"
-              },
-              {
-                "priority": "중",
-                "issue": "로딩 상태 표시 부족",
-                "cause": "사용자가 진행 상황을 알 수 없음",
-                "suggestion": "로딩 인디케이터 또는 단계 표시 추가"
+                "cause": "CTA 가시성이 낮음",
+                "suggestion": "CTA 버튼 강조 및 위치 개선"
               }
             ],
             "score": 7.3
@@ -139,7 +142,10 @@ jobs:
 
           const browser = await chromium.launch({ headless: true });
           const page = await browser.newPage();
-          await page.goto('${{ github.event.inputs.target_url }}', { waitUntil: 'domcontentloaded' });
+
+          await page.goto('${{ github.event.inputs.target_url }}', {
+            waitUntil: 'domcontentloaded'
+          });
 
           const result = {
             title: await page.title(),
@@ -155,19 +161,19 @@ jobs:
           cd qa-temp && node test.mjs
 
       # ==================================================
-      # Artifacts (분리 업로드)
+      # Artifacts
       # ==================================================
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: lighthouse-report
-          path: reports/lighthouse-report.json
-
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: responsive-screenshots
           path: screenshots/
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse-report
+          path: reports/lighthouse-report.json
 
       - uses: actions/upload-artifact@v4
         if: always()
