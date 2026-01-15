@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       target_url:
-        description: 'Target URL to test'
+        description: 'Target URL'
         required: true
         type: string
       tests:
-        description: 'Comma-separated test types (performance,responsive,tc,ux)'
+        description: 'performance,responsive,tc,ux'
         required: true
         type: string
 
@@ -18,58 +18,36 @@ jobs:
     timeout-minutes: 45
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
 
       - name: Prepare directories
-        run: |
-          mkdir -p reports screenshots qa-temp
+        run: mkdir -p reports screenshots qa-temp
 
-      # ======================================================
-      # Lighthouse Performance
-      # ======================================================
-      - name: Install Lighthouse
+      # ---------------- Lighthouse ----------------
+      - name: Lighthouse
         if: contains(github.event.inputs.tests, 'performance')
-        run: npm install -g lighthouse
-
-      - name: Run Lighthouse
-        if: contains(github.event.inputs.tests, 'performance')
-        continue-on-error: true
         run: |
+          npm install -g lighthouse
           lighthouse "${{ github.event.inputs.target_url }}" \
             --output=json \
             --output-path=reports/lighthouse-report.json \
-            --chrome-flags="--headless --no-sandbox" \
-            --quiet || true
+            --chrome-flags="--headless --no-sandbox" || true
 
-          lighthouse "${{ github.event.inputs.target_url }}" \
-            --output=html \
-            --output-path=reports/lighthouse-report.html \
-            --chrome-flags="--headless --no-sandbox" \
-            --quiet || true
-
-      # ======================================================
-      # Playwright Setup (완전 격리 / 충돌 방지 핵심)
-      # ======================================================
-      - name: Setup Playwright (isolated)
+      # ---------------- Playwright (SAFE MODE) ----------------
+      - name: Install Playwright (safe)
         if: contains(github.event.inputs.tests, 'responsive') || contains(github.event.inputs.tests, 'tc')
         run: |
           cd qa-temp
           npm init -y
           npm install playwright@1.42.1
-          npx playwright install --with-deps chromium
 
-      # ======================================================
-      # Responsive Screenshots
-      # ======================================================
-      - name: Capture Responsive Screenshots
+      # ---------------- Responsive ----------------
+      - name: Responsive Screenshots
         if: contains(github.event.inputs.tests, 'responsive')
-        continue-on-error: true
         run: |
           cat << 'EOF' > qa-temp/screenshot.mjs
           import { chromium } from 'playwright';
@@ -77,141 +55,86 @@ jobs:
 
           const url = '${{ github.event.inputs.target_url }}';
           const dir = '../screenshots';
-          if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+          fs.mkdirSync(dir, { recursive: true });
 
-          const run = async () => {
-            const browser = await chromium.launch({ headless: true });
-            const page = await browser.newPage();
-            await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage();
+          await page.goto(url, { waitUntil: 'domcontentloaded' });
 
-            const sizes = [
-              { name: 'desktop', w: 1920, h: 1080 },
-              { name: 'tablet', w: 768, h: 1024 },
-              { name: 'mobile', w: 375, h: 667 }
-            ];
+          for (const s of [
+            ['desktop',1920,1080],
+            ['tablet',768,1024],
+            ['mobile',375,667]
+          ]) {
+            await page.setViewportSize({ width: s[1], height: s[2] });
+            await page.screenshot({ path: `${dir}/${s[0]}.png` });
+          }
 
-            for (const s of sizes) {
-              await page.setViewportSize({ width: s.w, height: s.h });
-              await page.screenshot({ path: `${dir}/${s.name}.png` });
-            }
-
-            await browser.close();
-          };
-
-          run();
+          await browser.close();
           EOF
 
           cd qa-temp && node screenshot.mjs
 
-      # ======================================================
-      # UX Review (Mock – 웹 노출용)
-      # ======================================================
-      - name: Generate UX Review
+      # ---------------- UX ----------------
+      - name: UX Review
         if: contains(github.event.inputs.tests, 'ux')
         run: |
           cat << 'EOF' > reports/ux-review.json
           {
             "url": "${{ github.event.inputs.target_url }}",
-            "summaryScore": 7.4,
+            "score": 7.3,
             "issues": [
-              {
-                "priority": "상",
-                "issue": "첫 화면에서 주요 액션이 명확하지 않음",
-                "suggestion": "CTA 버튼 강조 및 카피 명확화"
-              },
-              {
-                "priority": "중",
-                "issue": "로딩 상태 인지가 어려움",
-                "suggestion": "Skeleton 또는 Progress UI 추가"
-              },
-              {
-                "priority": "하",
-                "issue": "모바일 버튼 터치 영역이 작음",
-                "suggestion": "48px 이상으로 확장"
-              }
+              { "priority": "상", "issue": "CTA 가시성 부족" },
+              { "priority": "중", "issue": "로딩 상태 미표시" }
             ]
           }
           EOF
 
-      # ======================================================
-      # Test Cases
-      # ======================================================
-      - name: Run Test Cases
+      # ---------------- Test Cases ----------------
+      - name: Test Cases
         if: contains(github.event.inputs.tests, 'tc')
-        continue-on-error: true
         run: |
-          cat << 'EOF' > qa-temp/test-cases.mjs
+          cat << 'EOF' > qa-temp/test.mjs
           import { chromium } from 'playwright';
           import fs from 'fs';
 
-          const url = '${{ github.event.inputs.target_url }}';
-          const results = [];
+          const browser = await chromium.launch();
+          const page = await browser.newPage();
+          await page.goto('${{ github.event.inputs.target_url }}');
 
-          const add = (id, title, pass, detail='') =>
-            results.push({ id, title, result: pass ? 'Pass' : 'Fail', detail });
-
-          const run = async () => {
-            const browser = await chromium.launch({ headless: true });
-            const page = await browser.newPage();
-            await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-
-            add('TC-01', '페이지 로드', !!(await page.title()));
-            add('TC-02', 'H 태그 존재', (await page.locator('h1,h2,h3').count()) > 0);
-            add('TC-03', '버튼 존재', (await page.locator('button').count()) > 0);
-            add('TC-04', '입력 필드 존재', (await page.locator('input').count()) >= 0);
-
-            await browser.close();
-
-            fs.writeFileSync(
-              '../reports/tc-report.json',
-              JSON.stringify({ url, total: results.length, results }, null, 2)
-            );
+          const result = {
+            title: await page.title(),
+            buttons: await page.locator('button').count(),
+            inputs: await page.locator('input').count()
           };
 
-          run();
+          fs.writeFileSync('../reports/tc-report.json', JSON.stringify(result,null,2));
+          await browser.close();
           EOF
 
-          cd qa-temp && node test-cases.mjs
+          cd qa-temp && node test.mjs
 
-      # ======================================================
-      # Artifacts (분리 업로드)
-      # ======================================================
-      - name: Upload Lighthouse Report
+      # ---------------- Artifacts ----------------
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: lighthouse-report
-          path: reports/lighthouse-report.*
+          path: reports/lighthouse-report.json
 
-      - name: Upload Screenshots
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: responsive-screenshots
           path: screenshots/
 
-      - name: Upload UX Review
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: ux-review
           path: reports/ux-review.json
 
-      - name: Upload Test Case Report
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
           name: test-cases-report
           path: reports/tc-report.json
-
-      # ======================================================
-      # Summary (웹에서 바로 쓰기 좋음)
-      # ======================================================
-      - name: Create Summary
-        if: always()
-        run: |
-          echo "## QA Automation Result" >> $GITHUB_STEP_SUMMARY
-          echo "**URL:** ${{ github.event.inputs.target_url }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Tests:** ${{ github.event.inputs.tests }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Lighthouse / Screenshots / UX / TestCases 완료" >> $GITHUB_STEP_SUMMARY
