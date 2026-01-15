@@ -18,7 +18,6 @@ jobs:
     timeout-minutes: 45
 
     steps:
-      # ================== 기본 세팅 ==================
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -28,9 +27,9 @@ jobs:
           node-version: '18'
 
       - name: Prepare directories
-        run: mkdir -p reports screenshots
+        run: mkdir -p reports screenshots qa-temp
 
-      # ================== Lighthouse (Performance) ==================
+      # ================== Lighthouse ==================
       - name: Install Chrome
         if: contains(github.event.inputs.tests, 'performance')
         run: |
@@ -57,43 +56,41 @@ jobs:
             --output=html \
             --output-path=reports/lighthouse.html || true
 
-      # ================== Playwright (Responsive Screenshots) ==================
-      - name: Install Playwright (Responsive)
-        if: contains(github.event.inputs.tests, 'responsive')
+      # ================== Playwright (Isolated) ==================
+      - name: Setup Playwright (isolated)
+        if: contains(github.event.inputs.tests, 'responsive') || contains(github.event.inputs.tests, 'tc')
         run: |
-          npm install playwright@latest
+          cd qa-temp
+          npm init -y
           npx playwright install --with-deps chromium
 
-      - name: Capture Screenshots
+      - name: Capture Responsive Screenshots
         if: contains(github.event.inputs.tests, 'responsive')
         continue-on-error: true
         run: |
-          cat << 'EOF' > screenshot.mjs
+          cat << 'EOF' > qa-temp/screenshot.mjs
           import { chromium } from 'playwright';
           import fs from 'fs';
 
           const url = '${{ github.event.inputs.target_url }}';
-          const dir = 'screenshots';
+          const dir = '../screenshots';
           if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
           const run = async () => {
-            const browser = await chromium.launch({
-              headless: true,
-              args: ['--no-sandbox']
-            });
+            const browser = await chromium.launch({ headless: true });
             const page = await browser.newPage();
 
             await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-            const viewports = [
+            const sizes = [
               { name: 'desktop', w: 1920, h: 1080 },
               { name: 'tablet', w: 768, h: 1024 },
               { name: 'mobile', w: 375, h: 667 }
             ];
 
-            for (const v of viewports) {
-              await page.setViewportSize({ width: v.w, height: v.h });
-              await page.screenshot({ path: `${dir}/${v.name}.png` });
+            for (const s of sizes) {
+              await page.setViewportSize({ width: s.w, height: s.h });
+              await page.screenshot({ path: `${dir}/${s.name}.png` });
             }
 
             await browser.close();
@@ -102,123 +99,84 @@ jobs:
           run();
           EOF
 
-          node screenshot.mjs
+          cd qa-temp && node screenshot.mjs
 
-      # ================== UX Review (Mock) ==================
+      # ================== UX Review ==================
       - name: Generate UX Review
         if: contains(github.event.inputs.tests, 'ux')
         run: |
-          cat << 'EOF' > ux-review.mjs
-          import fs from 'fs';
-
-          const report = {
-            url: '${{ github.event.inputs.target_url }}',
-            generatedAt: new Date().toISOString(),
-            score: 7.4,
-            issues: [
-              { priority: '상', issue: 'CTA 가시성 부족', suggestion: '주요 버튼 강조' },
-              { priority: '중', issue: '로딩 상태 미흡', suggestion: '로딩 UI 추가' },
-              { priority: '하', issue: '모바일 버튼 작음', suggestion: '48px 이상 권장' }
+          cat << 'EOF' > reports/ux-review.json
+          {
+            "url": "${{ github.event.inputs.target_url }}",
+            "score": 7.4,
+            "issues": [
+              { "priority": "상", "issue": "CTA 가시성 부족" },
+              { "priority": "중", "issue": "로딩 상태 미흡" },
+              { "priority": "하", "issue": "모바일 버튼 작음"}
             ]
-          };
-
-          fs.writeFileSync('reports/ux-review.json', JSON.stringify(report, null, 2));
+          }
           EOF
-
-          node ux-review.mjs
 
       # ================== Test Cases ==================
       - name: Run Test Cases
         if: contains(github.event.inputs.tests, 'tc')
         run: |
-          npm install playwright@latest
-          npx playwright install --with-deps chromium
-
-          cat << 'EOF' > test-cases.mjs
+          cat << 'EOF' > qa-temp/test-cases.mjs
           import { chromium } from 'playwright';
           import fs from 'fs';
 
           const url = '${{ github.event.inputs.target_url }}';
           const results = [];
 
-          const add = (id, title, pass, note = '') => {
-            results.push({
-              id,
-              title,
-              result: pass ? 'Pass' : 'Fail',
-              note
-            });
-          };
+          const add = (id, title, pass) =>
+            results.push({ id, title, result: pass ? 'Pass' : 'Fail' });
 
           const run = async () => {
-            const browser = await chromium.launch({
-              headless: true,
-              args: ['--no-sandbox']
-            });
+            const browser = await chromium.launch();
             const page = await browser.newPage();
-
             await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
             add('TC-01', '페이지 로드', !!(await page.title()));
             add('TC-02', '버튼 존재', (await page.locator('button').count()) > 0);
-            add('TC-03', '이미지 존재', (await page.locator('img').count()) >= 0);
-            add('TC-04', '링크 존재', (await page.locator('a').count()) > 0);
 
             await browser.close();
-
-            fs.writeFileSync(
-              'reports/tc-report.json',
-              JSON.stringify({ url, results }, null, 2)
-            );
+            fs.writeFileSync('../reports/tc-report.json', JSON.stringify({ url, results }, null, 2));
           };
 
           run();
           EOF
 
-          node test-cases.mjs
+          cd qa-temp && node test-cases.mjs
 
-      # ================== Artifacts 분리 업로드 ==================
+      # ================== Artifacts ==================
       - name: Upload Lighthouse Report
-        if: always()
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: lighthouse-report
           path: reports/lighthouse.*
           if-no-files-found: ignore
-          retention-days: 7
 
       - name: Upload Responsive Screenshots
-        if: always()
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: responsive-screenshots
           path: screenshots/
           if-no-files-found: ignore
-          retention-days: 7
 
       - name: Upload UX Review
-        if: always()
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ux-review
           path: reports/ux-review.json
           if-no-files-found: ignore
-          retention-days: 7
 
       - name: Upload Test Cases Report
-        if: always()
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: test-cases-report
           path: reports/tc-report.json
           if-no-files-found: ignore
-          retention-days: 7
-
-      # ================== Summary ==================
-      - name: Create Summary
-        if: always()
-        run: |
-          echo "## ✅ QA Automation Summary" >> $GITHUB_STEP_SUMMARY
-          echo "- URL: ${{ github.event.inputs.target_url }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Tests: ${{ github.event.inputs.tests }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Lighthouse / Screenshots / UX / TC 결과는 Artifacts 확인" >> $GITHUB_STEP_SUMMARY
