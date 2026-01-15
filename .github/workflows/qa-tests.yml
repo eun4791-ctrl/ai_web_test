@@ -27,7 +27,9 @@ jobs:
       - name: Prepare directories
         run: mkdir -p reports screenshots qa-temp
 
-      # ---------------- Lighthouse ----------------
+      # ==================================================
+      # Lighthouse
+      # ==================================================
       - name: Lighthouse
         if: contains(github.event.inputs.tests, 'performance')
         run: |
@@ -37,15 +39,20 @@ jobs:
             --output-path=reports/lighthouse-report.json \
             --chrome-flags="--headless --no-sandbox" || true
 
-      # ---------------- Playwright (SAFE MODE) ----------------
-      - name: Install Playwright (safe)
+      # ==================================================
+      # Playwright (정답 루트)
+      # ==================================================
+      - name: Install Playwright (chromium only)
         if: contains(github.event.inputs.tests, 'responsive') || contains(github.event.inputs.tests, 'tc')
         run: |
           cd qa-temp
           npm init -y
           npm install playwright@1.42.1
+          npx playwright install chromium
 
-      # ---------------- Responsive ----------------
+      # ==================================================
+      # Responsive Screenshots
+      # ==================================================
       - name: Responsive Screenshots
         if: contains(github.event.inputs.tests, 'responsive')
         run: |
@@ -54,20 +61,20 @@ jobs:
           import fs from 'fs';
 
           const url = '${{ github.event.inputs.target_url }}';
-          const dir = '../screenshots';
-          fs.mkdirSync(dir, { recursive: true });
+          const out = '../screenshots';
+          fs.mkdirSync(out, { recursive: true });
 
           const browser = await chromium.launch({ headless: true });
           const page = await browser.newPage();
-          await page.goto(url, { waitUntil: 'domcontentloaded' });
+          await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-          for (const s of [
+          for (const [name,w,h] of [
             ['desktop',1920,1080],
             ['tablet',768,1024],
             ['mobile',375,667]
           ]) {
-            await page.setViewportSize({ width: s[1], height: s[2] });
-            await page.screenshot({ path: `${dir}/${s[0]}.png` });
+            await page.setViewportSize({ width: w, height: h });
+            await page.screenshot({ path: `${out}/${name}.png` });
           }
 
           await browser.close();
@@ -75,7 +82,9 @@ jobs:
 
           cd qa-temp && node screenshot.mjs
 
-      # ---------------- UX ----------------
+      # ==================================================
+      # UX Review
+      # ==================================================
       - name: UX Review
         if: contains(github.event.inputs.tests, 'ux')
         run: |
@@ -85,12 +94,14 @@ jobs:
             "score": 7.3,
             "issues": [
               { "priority": "상", "issue": "CTA 가시성 부족" },
-              { "priority": "중", "issue": "로딩 상태 미표시" }
+              { "priority": "중", "issue": "로딩 상태 표시 없음" }
             ]
           }
           EOF
 
-      # ---------------- Test Cases ----------------
+      # ==================================================
+      # Test Cases
+      # ==================================================
       - name: Test Cases
         if: contains(github.event.inputs.tests, 'tc')
         run: |
@@ -114,7 +125,9 @@ jobs:
 
           cd qa-temp && node test.mjs
 
-      # ---------------- Artifacts ----------------
+      # ==================================================
+      # Artifacts (분리)
+      # ==================================================
       - uses: actions/upload-artifact@v4
         if: always()
         with:
