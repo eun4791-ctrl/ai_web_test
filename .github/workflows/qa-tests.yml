@@ -116,19 +116,19 @@ jobs:
         run: |
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
           cat << EOF > reports/ux-review.json
-          {
-            "url": "${{ github.event.inputs.target_url }}",
-            "timestamp": "$TIMESTAMP",
-            "reviews": [
-              {
-                "priority": "상",
-                "issue": "첫 화면에서 주요 기능이 명확하지 않음",
-                "cause": "CTA 가시성이 낮음",
-                "suggestion": "CTA 버튼 강조 및 위치 개선"
-              }
-            ],
-            "score": 7.3
-          }
+{
+  "url": "${{ github.event.inputs.target_url }}",
+  "timestamp": "$TIMESTAMP",
+  "reviews": [
+    {
+      "priority": "상",
+      "issue": "첫 화면에서 주요 기능이 명확하지 않음",
+      "cause": "CTA 가시성이 낮음",
+      "suggestion": "CTA 버튼 강조 및 위치 개선"
+    }
+  ],
+  "score": 7.3
+}
 EOF
 
       # ==================================================
