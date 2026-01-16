@@ -1,4 +1,4 @@
-name: QA Automation Tests
+name: QA Automation Tests - Updated
 
 on:
   workflow_dispatch:
