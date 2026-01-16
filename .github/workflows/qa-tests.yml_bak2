@@ -1,4 +1,4 @@
-name: QA Automation Tests - Updated
+name: QA Automation Tests
 
 on:
   workflow_dispatch:
@@ -114,11 +114,10 @@ jobs:
       - name: UX Review
         if: contains(github.event.inputs.tests, 'ux')
         run: |
-          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")
-          cat << EOF > reports/ux-review.json
+          cat << 'EOF' > reports/ux-review.json
           {
             "url": "${{ github.event.inputs.target_url }}",
-            "timestamp": "$TIMESTAMP",
+            "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%S.000Z")",
             "reviews": [
               {
                 "priority": "상",
