@@ -181,24 +181,83 @@ jobs:
               if (msg.type() === 'error') consoleErrors.push(msg.text());
             });
 
-            await page.setViewportSize({ width: 375, height: 667 });
-            await page.waitForTimeout(500);
-
-            await page.setViewportSize({ width: 1920, height: 1080 });
-            await page.waitForTimeout(500);
-
-            const testCases = [
-              { id: 'TC-001', title: '페이지 정상 로드', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: 'Pass', details: `Title: ${title}` },
-              { id: 'TC-002', title: '주요 제목 요소 존재', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: 'Pass', details: `Found ${headings} headings` },
-              { id: 'TC-003', title: '클릭 가능한 버튼 존재', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: 'Pass', details: `Found ${buttons} buttons` },
-              { id: 'TC-004', title: '입력 필드 존재', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: 'Pass', details: `Found ${inputs} input fields` },
-              { id: 'TC-005', title: '모바일 화면 렌더링', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: 'Pass', details: 'Mobile viewport 375x667' },
-              { id: 'TC-006', title: '데스크톱 화면 렌더링', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: 'Pass', details: 'Desktop viewport 1920x1080' },
-              { id: 'TC-007', title: '이미지 요소 로드', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: 'Pass', details: `Found ${images} images` },
-              { id: 'TC-008', title: '네비게이션 링크 존재', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: 'Pass', details: `Found ${links} links` },
-              { id: 'TC-009', title: '페이지 로드 시간 확인', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: 'Pass', details: `Load time: ${loadTime}ms` },
-              { id: 'TC-010', title: '콘솔 에러 없음', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: 'Pass', details: `Errors: ${consoleErrors.length}` }
-            ];
+            const testResults = {};
+            testResults['TC-001'] = { id: 'TC-001', title: '페이지 정상 로드', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: loadTime < 30000 ? 'Pass' : 'Fail', details: `Title: ${title}, Load time: ${loadTime}ms` };
+            testResults['TC-002'] = { id: 'TC-002', title: '주요 제목 요소 존재', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: headings > 0 ? 'Pass' : 'Fail', details: `Found ${headings} headings` };
+            testResults['TC-003'] = { id: 'TC-003', title: '클릭 가능한 버튼 존재', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: buttons > 0 ? 'Pass' : 'Fail', details: `Found ${buttons} buttons` };
+            testResults['TC-004'] = { id: 'TC-004', title: '입력 필드 존재', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: inputs > 0 ? 'Pass' : 'Fail', details: `Found ${inputs} input fields` };
+            testResults['TC-005'] = { id: 'TC-005', title: '이미지 요소 로드', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: images > 0 ? 'Pass' : 'Fail', details: `Found ${images} images` };
+            testResults['TC-006'] = { id: 'TC-006', title: '네비게이션 링크 존재', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: links > 0 ? 'Pass' : 'Fail', details: `Found ${links} links` };
+            
+            let linkClickResult = 'Fail';
+            let linkClickDetails = 'No clickable links found';
+            if (links > 0) {
+              try {
+                const firstLink = page.locator('a').first();
+                const linkHref = await firstLink.getAttribute('href');
+                const initialUrl = page.url();
+                console.log('Clicking first link:', linkHref);
+                await firstLink.click({ timeout: 5000 });
+                await page.waitForTimeout(1000);
+                const finalUrl = page.url();
+                if (initialUrl !== finalUrl) {
+                  linkClickResult = 'Pass';
+                  linkClickDetails = `URL changed from ${initialUrl} to ${finalUrl}`;
+                } else {
+                  linkClickDetails = `URL did not change after click`;
+                }
+              } catch (e) {
+                linkClickDetails = `Error clicking link: ${e.message}`;
+              }
+            }
+            testResults['TC-007'] = { id: 'TC-007', title: '링크 클릭 상호작용', precondition: '클릭 가능한 링크 존재', testStep: '첫 번째 링크 클릭', expectedResults: 'URL 또는 페이지 변경', result: linkClickResult, details: linkClickDetails };
+            
+            let formTestResult = 'Fail';
+            let formTestDetails = 'No form found';
+            try {
+              const formCount = await page.locator('form').count();
+              if (formCount > 0) {
+                const form = page.locator('form').first();
+                const inputFields = form.locator('input');
+                const inputCount = await inputFields.count();
+                if (inputCount > 0) {
+                  for (let i = 0; i < inputCount; i++) {
+                    const input = inputFields.nth(i);
+                    const inputType = await input.getAttribute('type');
+                    if (inputType === 'email') {
+                      await input.fill('test@example.com');
+                    } else if (inputType === 'password') {
+                      await input.fill('TestPassword123!');
+                    } else if (inputType === 'number') {
+                      await input.fill('123');
+                    } else {
+                      await input.fill('Test Input Data');
+                    }
+                  }
+                  await page.waitForTimeout(500);
+                  const submitButton = form.locator('button[type="submit"], input[type="submit"]').first();
+                  const submitButtonCount = await submitButton.count();
+                  if (submitButtonCount > 0) {
+                    await submitButton.click({ timeout: 5000 });
+                    await page.waitForTimeout(1000);
+                    formTestResult = 'Pass';
+                    formTestDetails = 'Form filled and submitted successfully';
+                  } else {
+                    formTestDetails = 'Form found but no submit button';
+                  }
+                } else {
+                  formTestDetails = 'Form found but no input fields';
+                }
+              }
+            } catch (e) {
+              formTestDetails = `Error during form interaction: ${e.message}`;
+            }
+            testResults['TC-008'] = { id: 'TC-008', title: '폼 입력 상호작용', precondition: '입력 가능한 폼 존재', testStep: '폼 필드 입력 및 제출', expectedResults: '폼 제출 완료', result: formTestResult, details: formTestDetails };
+            
+            testResults['TC-009'] = { id: 'TC-009', title: '페이지 로드 시간 확인', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: loadTime < 10000 ? 'Pass' : 'Fail', details: `Load time: ${loadTime}ms` };
+            testResults['TC-010'] = { id: 'TC-010', title: '콘솔 에러 없음', precondition: 'URL 접근 가능', testStep: '사용자 행동 수행', expectedResults: '예상 결과 확인', result: consoleErrors.length === 0 ? 'Pass' : 'Fail', details: `Errors: ${consoleErrors.length}` };
+            
+            const testCases = Object.values(testResults);
 
             const result = {
               url: '${{ github.event.inputs.target_url }}',
