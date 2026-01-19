@@ -118,7 +118,7 @@ jobs:
           EOF
 
       # ==================================================
-      # Test Cases (🔥 여기 핵심 수정)
+      # Test Cases
       # ==================================================
       - name: Test Cases
         if: contains(github.event.inputs.tests, 'tc')
@@ -176,24 +176,45 @@ jobs:
               log: 'Scrolled'
             });
 
-            const links = page.locator('a[href]');
+            // ===============================
+            // ✅ TC-003 링크 클릭 (수정된 부분)
+            // ===============================
+            const links = page.locator('a[href]:visible');
             let linkResult = 'Fail';
-            let linkLog = 'No link';
+            let linkLog = 'No clickable link';
 
-            if (await links.count() > 0) {
+            const linkCount = await links.count();
+
+            for (let i = 0; i < linkCount; i++) {
+              const link = links.nth(i);
+              const box = await link.boundingBox();
+
+              if (!box || box.width === 0 || box.height === 0) continue;
+
               const before = page.url();
-              await links.first().click({ force: true });
-              await page.waitForTimeout(1000);
-              linkResult = page.url() !== before ? 'Pass' : 'Fail';
-              linkLog = `${before} → ${page.url()}`;
+
+              await link.scrollIntoViewIfNeeded();
+              await page.waitForTimeout(300);
+
+              try {
+                await link.click({ timeout: 3000 });
+                await page.waitForTimeout(800);
+
+                const after = page.url();
+                linkResult = before !== after ? 'Pass' : 'Fail';
+                linkLog = `${before} → ${after}`;
+                break;
+              } catch (e) {
+                continue;
+              }
             }
 
             add({
               id: 'TC-003',
               title: '링크 클릭',
-              precondition: '링크 존재',
-              testStep: '첫 링크 클릭',
-              expectedResults: '페이지 이동',
+              precondition: '클릭 가능한 링크 존재',
+              testStep: '화면 내 링크 클릭',
+              expectedResults: '페이지 이동 또는 URL 변경',
               result: linkResult,
               log: linkLog
             });
@@ -260,7 +281,7 @@ jobs:
               precondition: '링크 존재',
               testStep: 'Hover 수행',
               expectedResults: 'Hover 반응',
-              result: (await links.count()) > 0 ? 'Pass' : 'Fail',
+              result: linkCount > 0 ? 'Pass' : 'Fail',
               log: 'Hovered'
             });
 
@@ -294,7 +315,6 @@ jobs:
           EOF
 
           cd qa-temp && node test.mjs
-
 
       # ==================================================
       # Artifacts
