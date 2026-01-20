@@ -806,9 +806,9 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">QA 자동화 대시보드</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">URL Test Lab</h1>
           <p className="text-gray-600">
-            웹사이트 품질을 한 번에 검증하세요. 성능, 반응형, UX, 기능 테스트를 자동으로 실행합니다.
+            URL 입력만으로 실행하는 웹 QA 테스트 실험실
           </p>
         </div>
 
@@ -819,7 +819,7 @@ export default function Home() {
                 <Zap className="w-5 h-5" />
                 테스트 설정
               </CardTitle>
-              <CardDescription>테스트할 URL과 항목을 선택하세요</CardDescription>
+              <CardDescription>테스트할 URL을 입력하고 항목을 선택하세요.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -831,17 +831,17 @@ export default function Home() {
                   onChange={(e) => setUrl(e.target.value)}
                   disabled={isLoading}
                 />
-                <p className="text-xs text-gray-500 mt-1">https:// 프로토콜 자동 추가됩니다</p>
+                <p className="text-xs text-gray-500 mt-1">https:// 프로토콜 자동 추가됨</p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-3 block">🧪 실행할 테스트</label>
+                <label className="text-sm font-medium text-gray-700 mb-3 block">🧪 실행할 테스트 항목</label>
                 <div className="space-y-2">
                   {[
-                    { id: "performance", label: "Lighthouse 성능 확인", desc: "웹사이트 성능, 급근성, SEO 점수 분석" },
+                    { id: "performance", label: "Lighthouse 성능 확인", desc: "성능, 접근성, SEO 점수 분석" },
                     { id: "responsive", label: "Responsive Viewer 화면 확인", desc: "데스크톱, 태블릿, 모바일 화면 캡처" },
-                    { id: "ux", label: "AI UX 리뷰", desc: "사용자 경험 및 내게설 분석" },
-                    { id: "tc", label: "TC 작성 및 수행", desc: "기능 테스트 케이스 자동 실행" },
+                //    { id: "ux", label: "AI UX 리뷰", desc: "사용자 경험 및 내게설 분석" },
+                    { id: "tc", label: "시나리오 작성 및 수행", desc: "사용자 시나리오 테스트" },
                   ].map(({ id, label, desc }) => (
                     <label key={id} className="flex items-start gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer">
                       <Checkbox
@@ -873,7 +873,7 @@ export default function Home() {
                 {isLoading ? (
                   <>
                     <Clock className="w-4 h-4 mr-2 animate-spin" />
-                    실행 중... ({pollCount}초)
+                    실행 중... ({pollCount}회 확인 시도)
                   </>
                 ) : (
                   "테스트 실행"
@@ -1048,7 +1048,7 @@ export default function Home() {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <CheckCircle2 className="w-5 h-5 text-green-600" />
-                        TC 작성 및 수행
+                        시나리오 작성 및 수행
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -1090,7 +1090,7 @@ export default function Home() {
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Zap className="w-12 h-12 text-gray-300 mb-4" />
                   <p className="text-gray-500 text-center">
-                    URL을 입력하고 테스트를 선택한 후 "테스트 실행" 버튼을 클릭하세요
+                    URL을 입력하고 테스트 항목을 선택한 후 [테스트 실행] 버튼을 클릭하세요.
                   </p>
                 </CardContent>
               </Card>
