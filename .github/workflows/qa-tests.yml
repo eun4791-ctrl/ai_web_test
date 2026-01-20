@@ -378,6 +378,15 @@ jobs:
 
           await context.close();
           await browser.close();
+          
+          // 비디오 파일명 정렬 및 첫 번째 파일을 test-video.webm으로 이름 변경
+          const videoFiles = fs.readdirSync(videoDir).filter(f => f.endsWith('.webm')).sort();
+          if (videoFiles.length > 0) {
+            const mainVideoPath = path.join(videoDir, videoFiles[0]);
+            const renamedPath = path.join(videoDir, 'test-video.webm');
+            fs.renameSync(mainVideoPath, renamedPath);
+            console.log('Renamed first video to test-video.webm');
+          }
           EOF
 
           cd qa-temp && node test.mjs
