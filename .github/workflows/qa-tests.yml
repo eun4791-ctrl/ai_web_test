@@ -347,19 +347,31 @@ jobs:
             log: 'Completed'
           }, async () => {});
 
+          // rows 배열을 testCases 형식으로 변환
+          const testCases = rows.map(row => ({
+            id: row.id,
+            title: row.title,
+            precondition: row.precondition,
+            testStep: row.testStep,
+            expectedResults: row.expectedResults,
+            result: row.result,
+            details: row.log
+          }));
+
           fs.writeFileSync(
             '../reports/tc-report.json',
             JSON.stringify({
               url: '${{ github.event.inputs.target_url }}',
               timestamp: new Date().toISOString(),
+              testCases,
               summary: {
                 total: rows.length,
-                pass,
-                fail,
+                passed: pass,
+                failed: fail,
+                blocked: 0,
                 na,
                 successRate: Math.round((pass / rows.length) * 100)
-              },
-              rows
+              }
             }, null, 2)
           );
 
