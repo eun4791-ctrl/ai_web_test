@@ -126,6 +126,7 @@ jobs:
           cat << 'EOF' > qa-temp/test.mjs
           import { chromium } from 'playwright';
           import fs from 'fs';
+          import path from 'path';
 
           const videoDir = '../videos';
           fs.mkdirSync(videoDir, { recursive: true });
