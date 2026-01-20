@@ -310,7 +310,10 @@ jobs:
               2
             )
           );
+          EOF
 
+          npm install -g playwright
+          cd qa-temp && TARGET_URL="${{ github.event.inputs.target_url }}" node test.mjs
 
       # ==================================================
       # Artifacts
