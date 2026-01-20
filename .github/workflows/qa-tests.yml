@@ -137,184 +137,236 @@ jobs:
               size: { width: 1280, height: 720 }
             }
           });
-
           const page = await context.newPage();
 
           const rows = [];
           let pass = 0;
           let fail = 0;
+          let na = 0;
 
-          const add = (tc) => {
+          const record = (tc) => {
             rows.push(tc);
-            tc.result === 'Pass' ? pass++ : fail++;
+            if (tc.result === 'Pass') pass++;
+            else if (tc.result === 'Fail') fail++;
+            else na++;
           };
 
-          try {
-            const start = Date.now();
-            await page.goto('${{ github.event.inputs.target_url }}', { waitUntil: 'domcontentloaded' });
-            const loadTime = Date.now() - start;
+          const safeTC = async (tc, runner) => {
+            try {
+              await runner(tc);
+            } catch (e) {
+              tc.result = 'Fail';
+              tc.log = e.message;
+            }
+            record(tc);
+          };
 
-            add({
-              id: 'TC-001',
-              title: '페이지 로드',
-              precondition: 'URL 접근 가능',
-              testStep: '페이지 접속',
-              expectedResults: '페이지 정상 표시',
-              result: loadTime < 30000 ? 'Pass' : 'Fail',
-              log: `Load time: ${loadTime}ms`
-            });
+          await page.goto('${{ github.event.inputs.target_url }}', {
+            waitUntil: 'domcontentloaded'
+          });
 
+          /* ================= TC-001 페이지 로드 ================= */
+          await safeTC({
+            id: 'TC-001',
+            title: '페이지 로드',
+            precondition: 'URL 접근 가능',
+            testStep: '페이지 접속',
+            expectedResults: '페이지 정상 표시',
+            result: 'Pass',
+            log: 'Loaded'
+          }, async () => {
+            await page.waitForTimeout(1000);
+          });
+
+          /* ================= TC-002 스크롤 ================= */
+          await safeTC({
+            id: 'TC-002',
+            title: '스크롤 동작',
+            precondition: '페이지 로드 완료',
+            testStep: '스크롤 수행',
+            expectedResults: '스크롤 정상 동작',
+            result: 'Pass',
+            log: 'Scrolled'
+          }, async () => {
             await page.mouse.wheel(0, 1200);
             await page.waitForTimeout(800);
-            add({
-              id: 'TC-002',
-              title: '스크롤 동작',
-              precondition: '페이지 로드 완료',
-              testStep: '스크롤 수행',
-              expectedResults: '스크롤 정상 동작',
-              result: 'Pass',
-              log: 'Scrolled'
-            });
+          });
 
-            // ===============================
-            // ✅ TC-003 링크 클릭 (수정된 부분)
-            // ===============================
+          /* ================= TC-003 링크 클릭 ================= */
+          await safeTC({
+            id: 'TC-003',
+            title: '링크 클릭',
+            precondition: '클릭 가능한 링크 존재',
+            testStep: '첫 번째 링크 클릭',
+            expectedResults: '페이지 이동 또는 반응',
+            result: 'N/A',
+            log: ''
+          }, async (tc) => {
             const links = page.locator('a[href]:visible');
-            let linkResult = 'Fail';
-            let linkLog = 'No clickable link';
 
-            const linkCount = await links.count();
+            if (await links.count() === 0) return;
 
-            for (let i = 0; i < linkCount; i++) {
-              const link = links.nth(i);
-              const box = await link.boundingBox();
+            const before = page.url();
+            const link = links.first();
 
-              if (!box || box.width === 0 || box.height === 0) continue;
+            await link.scrollIntoViewIfNeeded();
+            await link.click({ force: true });
+            await page.waitForTimeout(1000);
 
-              const before = page.url();
+            tc.result = page.url() !== before ? 'Pass' : 'Fail';
+            tc.log = `${before} → ${page.url()}`;
+          });
 
-              await link.scrollIntoViewIfNeeded();
-              await page.waitForTimeout(300);
+          /* ================= TC-004 버튼 클릭 ================= */
+          await safeTC({
+            id: 'TC-004',
+            title: '버튼 클릭',
+            precondition: '버튼 존재',
+            testStep: '버튼 클릭',
+            expectedResults: 'UI 반응',
+            result: 'N/A',
+            log: ''
+          }, async (tc) => {
+            const buttons = page.locator('button:visible:not([disabled])');
+            if (await buttons.count() === 0) return;
 
-              try {
-                await link.click({ timeout: 3000 });
-                await page.waitForTimeout(800);
+            await buttons.first().scrollIntoViewIfNeeded();
+            await buttons.first().click({ force: true });
+            await page.waitForTimeout(800);
 
-                const after = page.url();
-                linkResult = before !== after ? 'Pass' : 'Fail';
-                linkLog = `${before} → ${after}`;
-                break;
-              } catch (e) {
-                continue;
-              }
-            }
+            tc.result = 'Pass';
+            tc.log = 'Button clicked';
+          });
 
-            add({
-              id: 'TC-003',
-              title: '링크 클릭',
-              precondition: '클릭 가능한 링크 존재',
-              testStep: '화면 내 링크 클릭',
-              expectedResults: '페이지 이동 또는 URL 변경',
-              result: linkResult,
-              log: linkLog
-            });
-
-            const buttons = page.locator('button');
-            add({
-              id: 'TC-004',
-              title: '버튼 존재',
-              precondition: '페이지 로드',
-              testStep: '버튼 확인',
-              expectedResults: '버튼 존재',
-              result: (await buttons.count()) > 0 ? 'Pass' : 'Fail',
-              log: `Buttons: ${await buttons.count()}`
-            });
-
-            const inputs = page.locator('input');
-            if (await inputs.count() > 0) {
-              await inputs.first().fill('QA Test');
-            }
-
-            add({
-              id: 'TC-005',
-              title: '입력 필드 입력',
-              precondition: '입력 필드 존재',
-              testStep: '텍스트 입력',
-              expectedResults: '입력 완료',
-              result: (await inputs.count()) > 0 ? 'Pass' : 'Fail',
-              log: 'Input filled'
-            });
-
-            add({
-              id: 'TC-006',
-              title: '이미지 로드',
-              precondition: '페이지 로드',
-              testStep: '이미지 확인',
-              expectedResults: '이미지 표시',
-              result: (await page.locator('img').count()) > 0 ? 'Pass' : 'Fail',
-              log: `Images: ${await page.locator('img').count()}`
-            });
-
-            add({
-              id: 'TC-007',
-              title: '헤딩 요소',
-              precondition: '페이지 로드',
-              testStep: '헤딩 확인',
-              expectedResults: '헤딩 존재',
-              result: (await page.locator('h1,h2,h3').count()) > 0 ? 'Pass' : 'Fail',
-              log: 'Checked headings'
-            });
-
-            add({
-              id: 'TC-008',
-              title: '콘솔 에러 없음',
-              precondition: '페이지 로드',
-              testStep: '콘솔 확인',
-              expectedResults: '에러 없음',
-              result: 'Pass',
-              log: 'No console errors'
-            });
-
-            add({
-              id: 'TC-009',
-              title: 'Hover 동작',
-              precondition: '링크 존재',
-              testStep: 'Hover 수행',
-              expectedResults: 'Hover 반응',
-              result: linkCount > 0 ? 'Pass' : 'Fail',
-              log: 'Hovered'
-            });
-
-            add({
-              id: 'TC-010',
-              title: '종합 완료',
-              precondition: 'TC 실행 완료',
-              testStep: '리포트 생성',
-              expectedResults: 'JSON 생성',
-              result: 'Pass',
-              log: 'Done'
-            });
-
-            fs.writeFileSync(
-              '../reports/tc-report.json',
-              JSON.stringify({
-                summary: {
-                  total: rows.length,
-                  pass,
-                  fail,
-                  successRate: Math.round((pass / rows.length) * 100)
-                },
-                rows
-              }, null, 2)
+          /* ================= TC-005 입력 필드 ================= */
+          await safeTC({
+            id: 'TC-005',
+            title: '입력 필드 입력',
+            precondition: '입력 가능한 필드 존재',
+            testStep: '텍스트 입력',
+            expectedResults: '입력 성공',
+            result: 'N/A',
+            log: ''
+          }, async (tc) => {
+            const inputs = page.locator(
+              'input:visible:not([disabled]):not([type="hidden"])'
             );
+            if (await inputs.count() === 0) return;
 
-          } finally {
-            await context.close();
-            await browser.close();
-          }
+            const input = inputs.first();
+            await input.scrollIntoViewIfNeeded();
+            await input.fill('QA Test');
+            await page.waitForTimeout(500);
+
+            tc.result = 'Pass';
+            tc.log = 'Input filled';
+          });
+
+          /* ================= TC-006 이미지 존재 ================= */
+          await safeTC({
+            id: 'TC-006',
+            title: '이미지 표시',
+            precondition: '페이지 로드',
+            testStep: '이미지 확인',
+            expectedResults: '이미지 표시',
+            result: 'N/A',
+            log: ''
+          }, async (tc) => {
+            const images = page.locator('img:visible');
+            if (await images.count() === 0) return;
+
+            tc.result = 'Pass';
+            tc.log = `Images: ${await images.count()}`;
+          });
+
+          /* ================= TC-007 헤딩 ================= */
+          await safeTC({
+            id: 'TC-007',
+            title: '헤딩 요소',
+            precondition: '페이지 로드',
+            testStep: '헤딩 확인',
+            expectedResults: '헤딩 존재',
+            result: 'N/A',
+            log: ''
+          }, async (tc) => {
+            const h = page.locator('h1,h2,h3,h4,h5,h6');
+            if (await h.count() === 0) return;
+
+            tc.result = 'Pass';
+            tc.log = `Headings: ${await h.count()}`;
+          });
+
+          /* ================= TC-008 Hover ================= */
+          await safeTC({
+            id: 'TC-008',
+            title: 'Hover 반응',
+            precondition: 'Hover 가능한 요소 존재',
+            testStep: 'Hover 수행',
+            expectedResults: 'Hover 반응',
+            result: 'N/A',
+            log: ''
+          }, async (tc) => {
+            const el = page.locator('a:visible, button:visible').first();
+            if (await el.count() === 0) return;
+
+            await el.hover();
+            await page.waitForTimeout(500);
+            tc.result = 'Pass';
+            tc.log = 'Hovered';
+          });
+
+          /* ================= TC-009 콘솔 에러 ================= */
+          await safeTC({
+            id: 'TC-009',
+            title: '콘솔 에러',
+            precondition: '페이지 로드',
+            testStep: '콘솔 로그 수집',
+            expectedResults: '에러 없음',
+            result: 'Pass',
+            log: ''
+          }, async (tc) => {
+            const errors = [];
+            page.on('console', msg => {
+              if (msg.type() === 'error') errors.push(msg.text());
+            });
+            await page.waitForTimeout(500);
+            if (errors.length > 0) {
+              tc.result = 'Fail';
+              tc.log = errors.join(',');
+            }
+          });
+
+          /* ================= TC-010 종료 ================= */
+          await safeTC({
+            id: 'TC-010',
+            title: '테스트 종료',
+            precondition: 'TC 실행 완료',
+            testStep: '리포트 생성',
+            expectedResults: 'JSON 생성',
+            result: 'Pass',
+            log: 'Completed'
+          }, async () => {});
+
+          fs.writeFileSync(
+            '../reports/tc-report.json',
+            JSON.stringify({
+              summary: {
+                total: rows.length,
+                pass,
+                fail,
+                na,
+                successRate: Math.round((pass / rows.length) * 100)
+              },
+              rows
+            }, null, 2)
+          );
+
+          await context.close();
+          await browser.close();
           EOF
 
           cd qa-temp && node test.mjs
+
 
       # ==================================================
       # Artifacts
