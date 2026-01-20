@@ -312,7 +312,7 @@ jobs:
           );
           EOF
 
-          cd qa-temp && npm install playwright node-fetch && TARGET_URL="${{ github.event.inputs.target_url }}" node test.mjs
+          cd qa-temp && npm install playwright node-fetch && npx playwright install && TARGET_URL="${{ github.event.inputs.target_url }}" node test.mjs
 
       # ==================================================
       # Artifacts
