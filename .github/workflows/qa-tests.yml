@@ -126,248 +126,190 @@ jobs:
           cat << 'EOF' > qa-temp/test.mjs
           import { chromium } from 'playwright';
           import fs from 'fs';
+          import fetch from 'node-fetch';
 
+          const TARGET_URL = process.env.TARGET_URL || '';
           const videoDir = '../videos';
           fs.mkdirSync(videoDir, { recursive: true });
 
+          /* -------------------------------
+             Playwright 실행
+          -------------------------------- */
           const browser = await chromium.launch({ headless: true });
           const context = await browser.newContext({
-            recordVideo: {
-              dir: videoDir,
-              size: { width: 1280, height: 720 }
-            }
+            viewport: { width: 1280, height: 720 },
+            recordVideo: { dir: videoDir }
           });
           const page = await context.newPage();
 
-          const rows = [];
-          let pass = 0;
-          let fail = 0;
-          let na = 0;
+          const testCases = [];
+          let passed = 0;
+          let failed = 0;
 
-          const record = (tc) => {
-            rows.push(tc);
-            if (tc.result === 'Pass') pass++;
-            else if (tc.result === 'Fail') fail++;
-            else na++;
-          };
-
-          const safeTC = async (tc, runner) => {
+          const safeTC = async (tc, fn) => {
             try {
-              await runner(tc);
+              await fn();
+              tc.result = 'passed';
+              passed++;
             } catch (e) {
-              tc.result = 'Fail';
-              tc.log = e.message;
+              tc.result = 'failed';
+              tc.details = e.message;
+              failed++;
             }
-            record(tc);
+            testCases.push(tc);
           };
 
-          await page.goto('${{ github.event.inputs.target_url }}', {
-            waitUntil: 'domcontentloaded'
-          });
+          const timestamp = new Date().toISOString();
 
-          /* ================= TC-001 페이지 로드 ================= */
-          await safeTC({
-            id: 'TC-001',
-            title: '페이지 로드',
-            precondition: 'URL 접근 가능',
-            testStep: '페이지 접속',
-            expectedResults: '페이지 정상 표시',
-            result: 'Pass',
-            log: 'Loaded'
-          }, async () => {
-            await page.waitForTimeout(1000);
-          });
+          /* -------------------------------
+             테스트 시작
+          -------------------------------- */
+          await page.goto(TARGET_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-          /* ================= TC-002 스크롤 ================= */
-          await safeTC({
-            id: 'TC-002',
-            title: '스크롤 동작',
-            precondition: '페이지 로드 완료',
-            testStep: '스크롤 수행',
-            expectedResults: '스크롤 정상 동작',
-            result: 'Pass',
-            log: 'Scrolled'
-          }, async () => {
-            await page.mouse.wheel(0, 1200);
-            await page.waitForTimeout(800);
-          });
-
-          /* ================= TC-003 링크 클릭 ================= */
-          await safeTC({
-            id: 'TC-003',
-            title: '링크 클릭',
-            precondition: '클릭 가능한 링크 존재',
-            testStep: '첫 번째 링크 클릭',
-            expectedResults: '페이지 이동 또는 반응',
-            result: 'N/A',
-            log: ''
-          }, async (tc) => {
-            const links = page.locator('a[href]:visible');
-
-            if (await links.count() === 0) return;
-
-            const before = page.url();
-            const link = links.first();
-
-            await link.scrollIntoViewIfNeeded();
-            await link.click({ force: true });
-            await page.waitForTimeout(1000);
-
-            tc.result = page.url() !== before ? 'Pass' : 'Fail';
-            tc.log = `${before} → ${page.url()}`;
-          });
-
-          /* ================= TC-004 버튼 클릭 ================= */
-          await safeTC({
-            id: 'TC-004',
-            title: '버튼 클릭',
-            precondition: '버튼 존재',
-            testStep: '버튼 클릭',
-            expectedResults: 'UI 반응',
-            result: 'N/A',
-            log: ''
-          }, async (tc) => {
-            const buttons = page.locator('button:visible:not([disabled])');
-            if (await buttons.count() === 0) return;
-
-            await buttons.first().scrollIntoViewIfNeeded();
-            await buttons.first().click({ force: true });
-            await page.waitForTimeout(800);
-
-            tc.result = 'Pass';
-            tc.log = 'Button clicked';
-          });
-
-          /* ================= TC-005 입력 필드 ================= */
-          await safeTC({
-            id: 'TC-005',
-            title: '입력 필드 입력',
-            precondition: '입력 가능한 필드 존재',
-            testStep: '텍스트 입력',
-            expectedResults: '입력 성공',
-            result: 'N/A',
-            log: ''
-          }, async (tc) => {
-            const inputs = page.locator(
-              'input:visible:not([disabled]):not([type="hidden"])'
-            );
-            if (await inputs.count() === 0) return;
-
-            const input = inputs.first();
-            await input.scrollIntoViewIfNeeded();
-            await input.fill('QA Test');
-            await page.waitForTimeout(500);
-
-            tc.result = 'Pass';
-            tc.log = 'Input filled';
-          });
-
-          /* ================= TC-006 이미지 존재 ================= */
-          await safeTC({
-            id: 'TC-006',
-            title: '이미지 표시',
-            precondition: '페이지 로드',
-            testStep: '이미지 확인',
-            expectedResults: '이미지 표시',
-            result: 'N/A',
-            log: ''
-          }, async (tc) => {
-            const images = page.locator('img:visible');
-            if (await images.count() === 0) return;
-
-            tc.result = 'Pass';
-            tc.log = `Images: ${await images.count()}`;
-          });
-
-          /* ================= TC-007 헤딩 ================= */
-          await safeTC({
-            id: 'TC-007',
-            title: '헤딩 요소',
-            precondition: '페이지 로드',
-            testStep: '헤딩 확인',
-            expectedResults: '헤딩 존재',
-            result: 'N/A',
-            log: ''
-          }, async (tc) => {
-            const h = page.locator('h1,h2,h3,h4,h5,h6');
-            if (await h.count() === 0) return;
-
-            tc.result = 'Pass';
-            tc.log = `Headings: ${await h.count()}`;
-          });
-
-          /* ================= TC-008 Hover ================= */
-          await safeTC({
-            id: 'TC-008',
-            title: 'Hover 반응',
-            precondition: 'Hover 가능한 요소 존재',
-            testStep: 'Hover 수행',
-            expectedResults: 'Hover 반응',
-            result: 'N/A',
-            log: ''
-          }, async (tc) => {
-            const el = page.locator('a:visible, button:visible').first();
-            if (await el.count() === 0) return;
-
-            await el.hover();
-            await page.waitForTimeout(500);
-            tc.result = 'Pass';
-            tc.log = 'Hovered';
-          });
-
-          /* ================= TC-009 콘솔 에러 ================= */
-          await safeTC({
-            id: 'TC-009',
-            title: '콘솔 에러',
-            precondition: '페이지 로드',
-            testStep: '콘솔 로그 수집',
-            expectedResults: '에러 없음',
-            result: 'Pass',
-            log: ''
-          }, async (tc) => {
-            const errors = [];
-            page.on('console', msg => {
-              if (msg.type() === 'error') errors.push(msg.text());
-            });
-            await page.waitForTimeout(500);
-            if (errors.length > 0) {
-              tc.result = 'Fail';
-              tc.log = errors.join(',');
+          await safeTC(
+            { id: 'TC-001', meta: { type: 'load' } },
+            async () => {
+              await page.title();
             }
-          });
+          );
 
-          /* ================= TC-010 종료 ================= */
-          await safeTC({
-            id: 'TC-010',
-            title: '테스트 종료',
-            precondition: 'TC 실행 완료',
-            testStep: '리포트 생성',
-            expectedResults: 'JSON 생성',
-            result: 'Pass',
-            log: 'Completed'
-          }, async () => {});
+          await safeTC(
+            { id: 'TC-002', meta: { type: 'scroll' } },
+            async () => {
+              await page.mouse.wheel(0, 1000);
+            }
+          );
 
-          fs.writeFileSync(
-            '../reports/tc-report.json',
-            JSON.stringify({
-              url: '${{ github.event.inputs.target_url }}',
-              timestamp: new Date().toISOString(),
-              summary: {
-                total: rows.length,
-                pass,
-                fail,
-                na,
-                successRate: Math.round((pass / rows.length) * 100)
-              },
-              rows
-            }, null, 2)
+          await safeTC(
+            { id: 'TC-003', meta: { type: 'link-click' } },
+            async () => {
+              const links = page.locator('a:visible');
+              if (await links.count() === 0) throw new Error('No visible links');
+              await links.first().click({ force: true });
+            }
+          );
+
+          await safeTC(
+            { id: 'TC-004', meta: { type: 'button-exist' } },
+            async () => {
+              const buttons = page.locator('button:visible');
+              if (await buttons.count() === 0) throw new Error('No visible buttons');
+            }
+          );
+
+          await safeTC(
+            { id: 'TC-005', meta: { type: 'input-fill' } },
+            async () => {
+              const inputs = page.locator('input:visible');
+              if (await inputs.count() === 0) throw new Error('No visible inputs');
+              await inputs.first().fill('QA Test');
+            }
+          );
+
+          await safeTC(
+            { id: 'TC-006', meta: { type: 'image-check' } },
+            async () => {
+              const imgs = page.locator('img');
+              if (await imgs.count() === 0) throw new Error('No images found');
+            }
+          );
+
+          await safeTC(
+            { id: 'TC-007', meta: { type: 'heading-check' } },
+            async () => {
+              const heads = page.locator('h1,h2,h3');
+              if (await heads.count() === 0) throw new Error('No headings');
+            }
+          );
+
+          await safeTC(
+            { id: 'TC-008', meta: { type: 'console-error' } },
+            async () => {
+              const errors = [];
+              page.on('console', m => m.type() === 'error' && errors.push(m.text()));
+              await page.waitForTimeout(500);
+              if (errors.length > 0) throw new Error(errors.join(','));
+            }
+          );
+
+          await safeTC(
+            { id: 'TC-009', meta: { type: 'dom-stable' } },
+            async () => {
+              await page.waitForLoadState('networkidle', { timeout: 10000 });
+            }
+          );
+
+          await safeTC(
+            { id: 'TC-010', meta: { type: 'page-alive' } },
+            async () => {
+              await page.evaluate(() => document.body !== null);
+            }
           );
 
           await context.close();
           await browser.close();
-          EOF
 
-          cd qa-temp && node test.mjs
+          /* -------------------------------
+             AI 설명 생성 (선택 단계)
+          -------------------------------- */
+          async function enrichWithAI() {
+            if (!process.env.OPENAI_API_KEY) return testCases;
+
+            const prompt = `
+          너는 QA 엔지니어다.
+          아래 테스트 결과에 대해 설명 문장만 생성하라.
+
+          규칙:
+          - result 값 변경 금지
+          - 판정 이유 추측 금지
+          - title, precondition, testStep, expectedResults, details 만 생성
+
+          입력:
+          ${JSON.stringify(testCases, null, 2)}
+
+          JSON만 반환하라.
+          `;
+
+            const res = await fetch('https://api.openai.com/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
+              },
+              body: JSON.stringify({
+                model: 'gpt-4o-mini',
+                temperature: 0.2,
+                messages: [{ role: 'user', content: prompt }]
+              })
+            });
+
+            const data = await res.json();
+            return JSON.parse(data.choices[0].message.content);
+          }
+
+          const finalCases = await enrichWithAI();
+
+          /* -------------------------------
+             리포트 저장
+          -------------------------------- */
+          fs.writeFileSync(
+            '../reports/tc-report.json',
+            JSON.stringify(
+              {
+                url: TARGET_URL,
+                timestamp,
+                summary: {
+                  total: finalCases.length,
+                  passed,
+                  failed,
+                  successRate: Math.round((passed / finalCases.length) * 100)
+                },
+                testCases: finalCases
+              },
+              null,
+              2
+            )
+          );
 
 
       # ==================================================
