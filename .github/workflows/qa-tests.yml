@@ -131,16 +131,19 @@ jobs:
           const videoDir = '../videos';
           fs.mkdirSync(videoDir, { recursive: true });
 
+          const TARGET_URL = '${{ github.event.inputs.target_url }}';
+
+          /* ================= 브라우저 / 컨텍스트 ================= */
           const browser = await chromium.launch({ headless: true });
+
           const context = await browser.newContext({
             recordVideo: {
               dir: videoDir,
-              size: { width: 1280, height: 720 },
-              fileName: 'test-video.webm'
+              size: { width: 1280, height: 720 }
             }
           });
-          const page = await context.newPage();
 
+          /* ================= 결과 집계 ================= */
           const rows = [];
           let pass = 0;
           let fail = 0;
@@ -153,6 +156,7 @@ jobs:
             else na++;
           };
 
+          /* ================= 공통 헬퍼 ================= */
           const safeTC = async (tc, runner) => {
             try {
               await runner(tc);
@@ -163,9 +167,22 @@ jobs:
             record(tc);
           };
 
-          await page.goto('${{ github.event.inputs.target_url }}', {
-            waitUntil: 'domcontentloaded'
-          });
+          /**
+           * TC 단위 page 실행
+           * - context 유지
+           * - page는 TC마다 새로 생성
+           * - video 하나로 이어짐
+           */
+          const runWithNewPage = async (runner) => {
+            const page = await context.newPage();
+            await page.goto(TARGET_URL, { waitUntil: 'domcontentloaded' });
+
+            try {
+              await runner(page);
+            } finally {
+              await page.close();
+            }
+          };
 
           /* ================= TC-001 페이지 로드 ================= */
           await safeTC({
@@ -177,7 +194,9 @@ jobs:
             result: 'Pass',
             log: 'Loaded'
           }, async () => {
-            await page.waitForTimeout(1000);
+            await runWithNewPage(async (page) => {
+              await page.waitForTimeout(1000);
+            });
           });
 
           /* ================= TC-002 스크롤 ================= */
@@ -190,8 +209,10 @@ jobs:
             result: 'Pass',
             log: 'Scrolled'
           }, async () => {
-            await page.mouse.wheel(0, 1200);
-            await page.waitForTimeout(800);
+            await runWithNewPage(async (page) => {
+              await page.mouse.wheel(0, 1200);
+              await page.waitForTimeout(800);
+            });
           });
 
           /* ================= TC-003 링크 클릭 ================= */
@@ -204,19 +225,18 @@ jobs:
             result: 'N/A',
             log: ''
           }, async (tc) => {
-            const links = page.locator('a[href]:visible');
+            await runWithNewPage(async (page) => {
+              const links = page.locator('a[href]:visible');
+              if (await links.count() === 0) return;
 
-            if (await links.count() === 0) return;
+              const before = page.url();
+              await links.first().scrollIntoViewIfNeeded();
+              await links.first().click({ force: true });
+              await page.waitForTimeout(1000);
 
-            const before = page.url();
-            const link = links.first();
-
-            await link.scrollIntoViewIfNeeded();
-            await link.click({ force: true });
-            await page.waitForTimeout(1000);
-
-            tc.result = page.url() !== before ? 'Pass' : 'Fail';
-            tc.log = `${before} → ${page.url()}`;
+              tc.result = page.url() !== before ? 'Pass' : 'Fail';
+              tc.log = `${before} → ${page.url()}`;
+            });
           });
 
           /* ================= TC-004 버튼 클릭 ================= */
@@ -229,15 +249,17 @@ jobs:
             result: 'N/A',
             log: ''
           }, async (tc) => {
-            const buttons = page.locator('button:visible:not([disabled])');
-            if (await buttons.count() === 0) return;
+            await runWithNewPage(async (page) => {
+              const buttons = page.locator('button:visible:not([disabled])');
+              if (await buttons.count() === 0) return;
 
-            await buttons.first().scrollIntoViewIfNeeded();
-            await buttons.first().click({ force: true });
-            await page.waitForTimeout(800);
+              await buttons.first().scrollIntoViewIfNeeded();
+              await buttons.first().click({ force: true });
+              await page.waitForTimeout(800);
 
-            tc.result = 'Pass';
-            tc.log = 'Button clicked';
+              tc.result = 'Pass';
+              tc.log = 'Button clicked';
+            });
           });
 
           /* ================= TC-005 입력 필드 ================= */
@@ -250,18 +272,18 @@ jobs:
             result: 'N/A',
             log: ''
           }, async (tc) => {
-            const inputs = page.locator(
-              'input:visible:not([disabled]):not([type="hidden"])'
-            );
-            if (await inputs.count() === 0) return;
+            await runWithNewPage(async (page) => {
+              const inputs = page.locator(
+                'input:visible:not([disabled]):not([type="hidden"])'
+              );
+              if (await inputs.count() === 0) return;
 
-            const input = inputs.first();
-            await input.scrollIntoViewIfNeeded();
-            await input.fill('QA Test');
-            await page.waitForTimeout(500);
+              await inputs.first().fill('QA Test');
+              await page.waitForTimeout(500);
 
-            tc.result = 'Pass';
-            tc.log = 'Input filled';
+              tc.result = 'Pass';
+              tc.log = 'Input filled';
+            });
           });
 
           /* ================= TC-006 이미지 존재 ================= */
@@ -274,11 +296,13 @@ jobs:
             result: 'N/A',
             log: ''
           }, async (tc) => {
-            const images = page.locator('img:visible');
-            if (await images.count() === 0) return;
+            await runWithNewPage(async (page) => {
+              const images = page.locator('img:visible');
+              if (await images.count() === 0) return;
 
-            tc.result = 'Pass';
-            tc.log = `Images: ${await images.count()}`;
+              tc.result = 'Pass';
+              tc.log = `Images: ${await images.count()}`;
+            });
           });
 
           /* ================= TC-007 헤딩 ================= */
@@ -291,11 +315,13 @@ jobs:
             result: 'N/A',
             log: ''
           }, async (tc) => {
-            const h = page.locator('h1,h2,h3,h4,h5,h6');
-            if (await h.count() === 0) return;
+            await runWithNewPage(async (page) => {
+              const h = page.locator('h1,h2,h3,h4,h5,h6');
+              if (await h.count() === 0) return;
 
-            tc.result = 'Pass';
-            tc.log = `Headings: ${await h.count()}`;
+              tc.result = 'Pass';
+              tc.log = `Headings: ${await h.count()}`;
+            });
           });
 
           /* ================= TC-008 Hover ================= */
@@ -308,13 +334,15 @@ jobs:
             result: 'N/A',
             log: ''
           }, async (tc) => {
-            const el = page.locator('a:visible, button:visible').first();
-            if (await el.count() === 0) return;
+            await runWithNewPage(async (page) => {
+              const el = page.locator('a:visible, button:visible').first();
+              if (await el.count() === 0) return;
 
-            await el.hover();
-            await page.waitForTimeout(500);
-            tc.result = 'Pass';
-            tc.log = 'Hovered';
+              await el.hover();
+              await page.waitForTimeout(500);
+              tc.result = 'Pass';
+              tc.log = 'Hovered';
+            });
           });
 
           /* ================= TC-009 콘솔 에러 ================= */
@@ -327,15 +355,17 @@ jobs:
             result: 'Pass',
             log: ''
           }, async (tc) => {
-            const errors = [];
-            page.on('console', msg => {
-              if (msg.type() === 'error') errors.push(msg.text());
+            await runWithNewPage(async (page) => {
+              const errors = [];
+              page.on('console', msg => {
+                if (msg.type() === 'error') errors.push(msg.text());
+              });
+              await page.waitForTimeout(500);
+              if (errors.length > 0) {
+                tc.result = 'Fail';
+                tc.log = errors.join(',');
+              }
             });
-            await page.waitForTimeout(500);
-            if (errors.length > 0) {
-              tc.result = 'Fail';
-              tc.log = errors.join(',');
-            }
           });
 
           /* ================= TC-010 종료 ================= */
