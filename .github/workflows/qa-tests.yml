@@ -431,7 +431,7 @@ jobs:
             });
           });
 
-          /* =================          /* TC-010 종료 */
+          /* TC-010 종료 */
           await safeTC({
             id: 'TC-010',
             title: '테스트 종료',
@@ -440,7 +440,7 @@ jobs:
             expectedResults: 'JSON 생성',
             result: 'Pass',
             log: 'Completed'
-          }, async () => {});> {});
+          }, async () => {});
 
           /* ================= 리포트 ================= */
           const testCases = rows.map(row => ({
