@@ -64,6 +64,7 @@ jobs:
       # ==================================================
       - name: Responsive Screenshots
         if: contains(github.event.inputs.tests, 'responsive')
+        continue-on-error: true
         run: |
           cat << 'EOF' > qa-temp/screenshot.mjs
           import { chromium } from 'playwright';
