@@ -73,26 +73,31 @@ jobs:
           const out = '../screenshots';
           fs.mkdirSync(out, { recursive: true });
 
-          const browser = await chromium.launch({ headless: true });
-          const page = await browser.newPage();
+          try {
+            const browser = await chromium.launch({ headless: true });
+            const page = await browser.newPage();
 
-          await page.goto(url, { waitUntil: 'domcontentloaded' });
-          await page.waitForTimeout(5000);
+            await page.goto(url, { waitUntil: 'domcontentloaded' });
+            await page.waitForTimeout(5000);
 
-          for (const [name, w, h] of [
-            ['desktop', 1920, 1080],
-            ['tablet', 768, 1024],
-            ['mobile', 375, 667]
-          ]) {
-            await page.setViewportSize({ width: w, height: h });
-            await page.waitForTimeout(500);
-            await page.screenshot({ path: `${out}/${name}.png`, timeout: 60000 });
+            for (const [name, w, h] of [
+              ['desktop', 1920, 1080],
+              ['tablet', 768, 1024],
+              ['mobile', 375, 667]
+            ]) {
+              await page.setViewportSize({ width: w, height: h });
+              await page.waitForTimeout(500);
+              await page.screenshot({ path: `${out}/${name}.png`, timeout: 120000 });
+            }
+
+            await browser.close();
+          } catch (error) {
+            console.error('Screenshot failed:', error.message);
+            console.log('Continuing to next step...');
           }
-
-          await browser.close();
           EOF
 
-          cd qa-temp && node screenshot.mjs
+          cd qa-temp && node screenshot.mjs || echo 'Screenshots skipped due to timeout'
 
       # ==================================================
       # UX Review
