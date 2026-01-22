@@ -51,7 +51,7 @@ async function startServer() {
   app.use("/videos", express.static(path.join(projectRoot, "videos")));
   app.use("/screenshots", express.static(path.join(projectRoot, "screenshots")));
   // development mode uses Vite, production mode uses static files
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV !== "production") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
