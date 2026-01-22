@@ -8,6 +8,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { agentRouter } from "../routers/agents";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -37,6 +38,7 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // tRPC API
+  // tRPC API
   app.use(
     "/api/trpc",
     createExpressMiddleware({
@@ -44,6 +46,9 @@ async function startServer() {
       createContext,
     })
   );
+
+  // AI Agent API
+  app.use("/api/agents", agentRouter);
 
   // Serve test artifacts statically
   const projectRoot = process.cwd();

@@ -1,0 +1,840 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e13]:
+          - paragraph [ref=e14]:
+            - link [ref=e15] [cursor=pointer]:
+              - /url: /promotion/plan/PM0069315E75
+          - paragraph [ref=e17]:
+            - link [ref=e18] [cursor=pointer]:
+              - /url: /promotion/plan/PM0067C86FE5
+          - button "닫기" [ref=e19] [cursor=pointer]:
+            - generic [ref=e20]: 닫기
+        - generic [ref=e21]:
+          - list [ref=e25]:
+            - listitem [ref=e26]:
+              - link "로그인" [ref=e27] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e28]:
+              - link "회원가입" [ref=e29] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e30]:
+              - link "고객센터" [ref=e31] [cursor=pointer]:
+                - /url: /com/cuc/CHPC0CUC0100M200
+          - generic [ref=e33]:
+            - generic [ref=e34]:
+              - heading "하나투어" [level=1] [ref=e35]:
+                - link "하나투어" [ref=e36] [cursor=pointer]:
+                  - /url: "#"
+              - group "통합 검색어 입력폼" [ref=e39]:
+                - generic [ref=e40]: 통합 검색어 입력폼
+                - generic [ref=e41]:
+                  - textbox "검색어" [ref=e42]:
+                    - /placeholder: "#해시태그 검색을 이용해보세요."
+                    - text: 2주한정, 추위 피해 떠나는! 물만난💦 세일위크 OPEN
+                  - button "검색" [ref=e43] [cursor=pointer]
+              - generic [ref=e45]:
+                - link "HOT 장가계" [ref=e974] [cursor=pointer]:
+                  - /url: "#"
+                - link "HOT 일본" [ref=e975] [cursor=pointer]:
+                  - /url: "#"
+                - link "HOT 대마도" [ref=e976] [cursor=pointer]:
+                  - /url: "#"
+                - link "HOT 다낭" [ref=e977] [cursor=pointer]:
+                  - /url: "#"
+                - link "HOT 홍콩" [ref=e978] [cursor=pointer]:
+                  - /url: "#"
+                - link "HOT 대만" [ref=e979] [cursor=pointer]:
+                  - /url: "#"
+                - link "HOT 후쿠오카" [ref=e980] [cursor=pointer]:
+                  - /url: "#"
+                - link "HOT 상해" [ref=e981] [cursor=pointer]:
+                  - /url: "#"
+                - link "HOT 오사카" [ref=e982] [cursor=pointer]:
+                  - /url: "#"
+                - link "HOT 나트랑" [ref=e983] [cursor=pointer]:
+                  - /url: "#"
+                - link "HOT 장가계" [ref=e984] [cursor=pointer]:
+                  - /url: "#"
+                - link "HOT 일본" [ref=e985] [cursor=pointer]:
+                  - /url: "#"
+              - text: HOT
+            - generic [ref=e47]:
+              - list:
+                - listitem [ref=e48]:
+                  - link "마이메뉴" [ref=e49] [cursor=pointer]:
+                    - /url: "#"
+                - listitem [ref=e50]:
+                  - link "예약내역" [ref=e51] [cursor=pointer]:
+                    - /url: "#"
+                - listitem [ref=e52]:
+                  - link "찜" [ref=e53] [cursor=pointer]:
+                    - /url: "#"
+          - generic [ref=e55]:
+            - generic:
+              - link "전체메뉴" [ref=e56] [cursor=pointer]:
+                - /url: "#none"
+              - list [ref=e57]:
+                - listitem [ref=e58]:
+                  - link "베스트" [ref=e59] [cursor=pointer]:
+                    - /url: /promotion/plan/PM0000114930
+                - listitem [ref=e60]:
+                  - link "해외여행" [ref=e61] [cursor=pointer]:
+                    - /url: /package/international
+                - listitem [ref=e62]:
+                  - link "항공" [ref=e63] [cursor=pointer]:
+                    - /url: /mma/smn/EX00000021
+                - listitem [ref=e64]:
+                  - link "호텔" [ref=e65] [cursor=pointer]:
+                    - /url: /mma/smn/EX00000020
+                - listitem [ref=e66]:
+                  - link "항공+호텔" [ref=e67] [cursor=pointer]:
+                    - /url: /package/fit
+                - listitem [ref=e68]:
+                  - link "투어/입장권" [ref=e69] [cursor=pointer]:
+                    - /url: /tour-ticket
+                - listitem [ref=e70]:
+                  - link "국내여행" [ref=e71] [cursor=pointer]:
+                    - /url: /package/domestic
+                - listitem [ref=e72]:
+                  - link "테마여행" [ref=e73] [cursor=pointer]:
+                    - /url: /package/trekking
+                - listitem [ref=e74]:
+                  - link "제우스" [ref=e75] [cursor=pointer]:
+                    - /url: https://zeus.hanatour.com/package/zeus
+                - listitem [ref=e76]:
+                  - link "해외골프" [ref=e77] [cursor=pointer]:
+                    - /url: /package/international-golf
+            - generic [ref=e78]:
+              - list:
+                - listitem [ref=e79]:
+                  - link "하나LIVE" [ref=e80] [cursor=pointer]:
+                    - /url: "#none"
+                - listitem [ref=e81]:
+                  - link "여행기획전" [ref=e82] [cursor=pointer]:
+                    - /url: "#none"
+                - listitem [ref=e83]:
+                  - link "이달의 혜택" [ref=e84] [cursor=pointer]:
+                    - /url: "#none"
+                - listitem
+          - generic [ref=e85]:
+            - generic [ref=e87]:
+              - img [ref=e93]
+              - button "여행 파트너 H-AI" [ref=e117] [cursor=pointer]:
+                - generic [ref=e118]: 여행 파트너
+                - generic [ref=e119]: H-AI
+            - link "최근 본 상품(0)" [ref=e120] [cursor=pointer]:
+              - /url: "#"
+              - text: 최근 본 상품(
+              - emphasis [ref=e121]: "0"
+              - text: )
+            - link "TOP" [ref=e122] [cursor=pointer]:
+              - /url: "#"
+      - generic [ref=e128]:
+        - generic [ref=e132]:
+          - generic [ref=e133]:
+            - paragraph [ref=e134]:
+              - text: 고객님,
+              - strong [ref=e135]: 어떤 여행을 꿈꾸시나요?
+            - generic [ref=e136]:
+              - list [ref=e137]:
+                - listitem [ref=e138]:
+                  - link "해외여행" [ref=e139] [cursor=pointer]:
+                    - /url: "#tabCon01"
+                - listitem [ref=e140]:
+                  - link "항공" [ref=e141] [cursor=pointer]:
+                    - /url: "#tabCon02"
+                - listitem [ref=e142]:
+                  - link "호텔" [ref=e143] [cursor=pointer]:
+                    - /url: "#tabCon03"
+              - generic [ref=e146]:
+                - textbox "검색어입력" [ref=e148]:
+                  - /placeholder: 어디로 떠나세요?
+                - generic [ref=e153] [cursor=pointer]: 출발지 전체
+                - link "여행시작일 선택" [ref=e155] [cursor=pointer]:
+                  - /url: "#none"
+                  - generic [ref=e156]: 여행시작일 선택
+                - button "해외여행 검색" [ref=e157] [cursor=pointer]
+          - generic [ref=e159]:
+            - generic [ref=e160]:
+              - group "1 / 15" [ref=e161] [cursor=pointer]:
+                - img [ref=e164]
+              - group "2 / 15" [ref=e165] [cursor=pointer]
+              - group "3 / 15" [ref=e168] [cursor=pointer]
+              - group "4 / 15" [ref=e171] [cursor=pointer]
+              - group "5 / 15" [ref=e174] [cursor=pointer]
+              - group "6 / 15" [ref=e177] [cursor=pointer]
+              - group "7 / 15" [ref=e180] [cursor=pointer]
+              - group "8 / 15" [ref=e183] [cursor=pointer]
+              - group "9 / 15" [ref=e186] [cursor=pointer]
+              - group "10 / 15" [ref=e189] [cursor=pointer]
+              - group "11 / 15" [ref=e192] [cursor=pointer]
+              - group "12 / 15" [ref=e195] [cursor=pointer]
+              - group "13 / 15" [ref=e198] [cursor=pointer]
+              - group "14 / 15" [ref=e201] [cursor=pointer]
+              - group "15 / 15" [ref=e204] [cursor=pointer]:
+                - img [ref=e207]
+            - generic [ref=e208]:
+              - button "Previous slide" [ref=e209] [cursor=pointer]:
+                - generic [ref=e210]: 이전
+              - button "Next slide" [ref=e211] [cursor=pointer]:
+                - generic [ref=e212]: 다음
+              - link "control" [ref=e213] [cursor=pointer]:
+                - /url: "#"
+                - generic [ref=e214]: control
+              - generic [ref=e215]: 4/13
+        - generic "[object Object]" [ref=e229]:
+          - generic [ref=e231]:
+            - strong [ref=e232]: 타임세일⏰️한정 특가
+            - paragraph [ref=e233]: 이번주 특가 여행 추천 리스트
+          - list [ref=e236]:
+            - listitem [ref=e237] [cursor=pointer]:
+              - generic [ref=e240]: 패키지
+              - strong [ref=e241]: "[인천/청주/부산/대구] 다낭 5일"
+              - paragraph [ref=e242]: "#미케비치5성 #바나힐 #스톤마사지"
+              - strong [ref=e244]: 349,000원~
+              - generic [ref=e246]: 🙌호텔 오션뷰 UP
+            - listitem [ref=e247] [cursor=pointer]:
+              - generic [ref=e250]: 패키지
+              - strong [ref=e251]: "[인천/부산] 푸꾸옥 5일"
+              - paragraph [ref=e252]: "#5성호텔 #야시장 #비치 #선셋타운"
+              - strong [ref=e254]: 399,000원~
+              - generic [ref=e256]: 1일 자유일정 보장😀
+            - listitem [ref=e257] [cursor=pointer]:
+              - generic [ref=e260]: 패키지
+              - strong [ref=e261]: "시드니 6,7일 #스테디셀러 🆚 신상품"
+              - paragraph [ref=e262]: "#포트스티븐스 투어 #전일정 4성호텔"
+              - strong [ref=e264]: 949,000원~
+              - generic [ref=e266]: 🎼오페라하우스 내부 관람
+            - listitem [ref=e267] [cursor=pointer]:
+              - generic [ref=e270]: 에어카텔
+              - strong [ref=e271]: 제주 에어카텔 3일
+              - paragraph [ref=e272]: "#설연휴 #항공+호텔+렌터카"
+              - strong [ref=e274]: 399,000원~
+              - generic [ref=e276]: 2월 설연휴 출발✈️
+        - generic "[object Object]" [ref=e277]:
+          - generic [ref=e279]:
+            - strong [ref=e280]: 물 만난💦세일위크
+            - paragraph [ref=e281]: 여행에서 빠질 수 없는 물놀이
+          - list [ref=e284]:
+            - listitem [ref=e285] [cursor=pointer]:
+              - generic [ref=e288]: 패키지
+              - strong [ref=e289]: 마나도 5일
+              - paragraph [ref=e290]: "#4성호텔 #시티투어"
+              - strong [ref=e292]: 549,000원~
+              - generic [ref=e294]: 호핑투어🐠
+            - listitem [ref=e295] [cursor=pointer]:
+              - generic [ref=e298]: 패키지
+              - strong [ref=e299]: 코타키나발루 5,6일
+              - paragraph [ref=e300]: "#마젤란or퍼시픽 #1DAY골드카드"
+              - strong [ref=e302]: 599,000원~
+              - generic [ref=e304]: 리조트 수영🏊️
+            - listitem [ref=e305] [cursor=pointer]:
+              - generic [ref=e308]: 에어텔
+              - strong [ref=e309]: 나트랑 자유여행 5일
+              - paragraph [ref=e310]: "#알마리조트 #왕복항공 #데이패스"
+              - strong [ref=e312]: 599,000원~
+              - generic [ref=e314]: 오션뷰 룸🏖️
+            - listitem [ref=e315] [cursor=pointer]:
+              - generic [ref=e318]: 패키지
+              - strong [ref=e319]: 홋카이도 4일
+              - paragraph [ref=e320]: "#후라노&비에이 #대게 무제한"
+              - strong [ref=e322]: 769,000원~
+              - generic [ref=e324]: 온천호텔♨️
+        - generic [ref=e327]:
+          - generic [ref=e329]:
+            - img [ref=e334] [cursor=pointer]
+            - tabpanel [ref=e335]
+            - tabpanel [ref=e339]
+            - tabpanel [ref=e343]
+            - img [ref=e351] [cursor=pointer]
+            - img [ref=e356] [cursor=pointer]
+            - img [ref=e361] [cursor=pointer]
+          - tablist [ref=e362]:
+            - tab "1 of 3" [selected] [ref=e363] [cursor=pointer]: "1"
+            - tab "2 of 3" [ref=e364] [cursor=pointer]: "2"
+            - tab "3 of 3" [ref=e365] [cursor=pointer]: "3"
+        - generic [ref=e367]:
+          - generic [ref=e368]:
+            - strong [ref=e370]:
+              - text: 원하는
+              - text: 가격으로
+              - text: 골라보기
+            - generic [ref=e371]:
+              - generic [ref=e372]:
+                - radio "~30만원 대 ➡️" [checked] [ref=e373]
+                - generic [ref=e374] [cursor=pointer]: ~30만원 대 ➡️
+              - generic [ref=e375]:
+                - radio "~50만원 대 ➡️" [ref=e376]
+                - generic [ref=e377] [cursor=pointer]: ~50만원 대 ➡️
+              - generic [ref=e378]:
+                - radio "~100만원 대 ➡️" [ref=e379]
+                - generic [ref=e380] [cursor=pointer]: ~100만원 대 ➡️
+          - list [ref=e383]:
+            - listitem [ref=e384] [cursor=pointer]:
+              - generic [ref=e386]:
+                - generic [ref=e388]: 패키지
+                - generic [ref=e389]:
+                  - strong [ref=e390]: 대련 3일
+                  - paragraph [ref=e391]: "#4성호텔 #동북요리 #팬더동물원"
+                - strong [ref=e393]: 199,000원~
+            - listitem [ref=e394] [cursor=pointer]:
+              - generic [ref=e396]:
+                - generic [ref=e398]: 패키지
+                - generic [ref=e399]:
+                  - strong [ref=e400]: 코타키나발루 5,6일
+                  - paragraph [ref=e401]: 그란디스 vs 샹그릴라 탄중아루
+                - strong [ref=e403]: 299,000원~
+            - listitem [ref=e404] [cursor=pointer]:
+              - generic [ref=e406]:
+                - generic [ref=e408]: 에어텔
+                - generic [ref=e409]:
+                  - strong [ref=e410]: 오사카 자유여행 3,4일
+                  - paragraph [ref=e411]: "#왕복 항공권 #시내 중심 호텔"
+                - strong [ref=e413]: 399,900원~
+        - generic [ref=e416]:
+          - strong [ref=e418]: 고객님만을 위한 추천여행
+          - generic [ref=e421]:
+            - button "Previous" [ref=e422] [cursor=pointer]: Previousprev
+            - generic [ref=e424]:
+              - link [ref=e429] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=AVP226260405RSJ
+                - generic [ref=e432]: 패키지
+                - strong [ref=e433]: "나트랑/달랏 5일 #NO옵션 #달랏2박 #$260상당혜택 #전일정5성호텔 #나트랑오 ..."
+                - strong [ref=e435]: 569,000원~
+              - link [ref=e440] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=CSP124260314JDA
+                - generic [ref=e443]: 패키지
+                - strong [ref=e444]: "[출발확정] [특별전세기/여강직항]여강(리장)/옥룡설산/샹그릴라 5일#NO팁+ ..."
+                - strong [ref=e446]: 1,349,000원~
+              - link [ref=e451] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=AVP209260203TW1
+                - generic [ref=e454]: 패키지
+                - strong [ref=e455]: "[출발확정] [홈쇼핑에디션] 하노이/하롱베이 5일 #NO옵션 #$280상당혜택 #굿 ..."
+                - strong [ref=e457]: 779,000원~
+              - link [ref=e462] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=EWP133260403TWB
+                - generic [ref=e465]: 패키지
+                - strong [ref=e466]: "서유럽 3국(이탈리아,스위스,프랑스) 8일 #융프라우 산악열차 #베네치아 수 ..."
+                - strong [ref=e468]: 5,145,400원~
+              - 'link "패키지 [출발확정] [한정특가] 하노이/하롱베이 5일 #100% 출발확정 #베스트셀러 ... 479,000원~" [ref=e473] [cursor=pointer]':
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=AVP2012602077CK
+                - generic [ref=e476]: 패키지
+                - strong [ref=e477]: "[출발확정] [한정특가] 하노이/하롱베이 5일 #100% 출발확정 #베스트셀러 ..."
+                - strong [ref=e479]: 479,000원~
+              - 'link "패키지 [홈쇼핑 에디션] 발리 6일 #4성급1박 + 림바 아야나3박 #남부+우붓투어 #2일 ... 1,708,000원~" [ref=e484] [cursor=pointer]':
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=ADP298260425KE2
+                - generic [ref=e487]: 패키지
+                - strong [ref=e488]: "[홈쇼핑 에디션] 발리 6일 #4성급1박 + 림바 아야나3박 #남부+우붓투어 #2일 ..."
+                - strong [ref=e490]: 1,708,000원~
+              - 'link "패키지 나트랑/달랏 5일 #NO옵션 #달랏2박 #$260상당혜택 #전일정5성호텔 #나트랑오 ... 569,000원~" [ref=e495] [cursor=pointer]':
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=AVP226260405RSJ
+                - generic [ref=e498]: 패키지
+                - strong [ref=e499]: "나트랑/달랏 5일 #NO옵션 #달랏2박 #$260상당혜택 #전일정5성호텔 #나트랑오 ..."
+                - strong [ref=e501]: 569,000원~
+              - link "패키지 [출발확정] [특별전세기/여강직항]여강(리장)/옥룡설산/샹그릴라 5일#NO팁+ ... 1,349,000원~" [ref=e506] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=CSP124260314JDA
+                - generic [ref=e509]: 패키지
+                - strong [ref=e510]: "[출발확정] [특별전세기/여강직항]여강(리장)/옥룡설산/샹그릴라 5일#NO팁+ ..."
+                - strong [ref=e512]: 1,349,000원~
+              - link [ref=e517] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=AVP209260203TW1
+                - generic [ref=e520]: 패키지
+                - strong [ref=e521]: "[출발확정] [홈쇼핑에디션] 하노이/하롱베이 5일 #NO옵션 #$280상당혜택 #굿 ..."
+                - strong [ref=e523]: 779,000원~
+              - link [ref=e528] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=EWP133260403TWB
+                - generic [ref=e531]: 패키지
+                - strong [ref=e532]: "서유럽 3국(이탈리아,스위스,프랑스) 8일 #융프라우 산악열차 #베네치아 수 ..."
+                - strong [ref=e534]: 5,145,400원~
+              - link [ref=e539] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=AVP2012602077CK
+                - generic [ref=e542]: 패키지
+                - strong [ref=e543]: "[출발확정] [한정특가] 하노이/하롱베이 5일 #100% 출발확정 #베스트셀러 ..."
+                - strong [ref=e545]: 479,000원~
+              - link [ref=e550] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=ADP298260425KE2
+                - generic [ref=e553]: 패키지
+                - strong [ref=e554]: "[홈쇼핑 에디션] 발리 6일 #4성급1박 + 림바 아야나3박 #남부+우붓투어 #2일 ..."
+                - strong [ref=e556]: 1,708,000원~
+              - link [ref=e561] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=AVP226260405RSJ
+                - generic [ref=e564]: 패키지
+                - strong [ref=e565]: "나트랑/달랏 5일 #NO옵션 #달랏2박 #$260상당혜택 #전일정5성호텔 #나트랑오 ..."
+                - strong [ref=e567]: 569,000원~
+              - link [ref=e572] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=CSP124260314JDA
+                - generic [ref=e575]: 패키지
+                - strong [ref=e576]: "[출발확정] [특별전세기/여강직항]여강(리장)/옥룡설산/샹그릴라 5일#NO팁+ ..."
+                - strong [ref=e578]: 1,349,000원~
+              - link [ref=e583] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=AVP209260203TW1
+                - generic [ref=e586]: 패키지
+                - strong [ref=e587]: "[출발확정] [홈쇼핑에디션] 하노이/하롱베이 5일 #NO옵션 #$280상당혜택 #굿 ..."
+                - strong [ref=e589]: 779,000원~
+              - link [ref=e594] [cursor=pointer]:
+                - /url: /trp/pkg/CHPC0PKG0200M200?pkgCd=EWP133260403TWB
+                - generic [ref=e597]: 패키지
+                - strong [ref=e598]: "서유럽 3국(이탈리아,스위스,프랑스) 8일 #융프라우 산악열차 #베네치아 수 ..."
+                - strong [ref=e600]: 5,145,400원~
+            - button "Next" [ref=e601] [cursor=pointer]: Nextnext
+        - generic [ref=e612]:
+          - 'link "2026-01 : 월간 여행지 예술가들이 사랑한 나라, 스페인 연중 따뜻한 기후로 언제든 여행하기 좋은 스페인☀️ 알함브라 궁전, 가우디 등 유명 건축물과 매혹적인 춤과 음악이 있는 플라멩코 공연, 스페인은 역사와 예술이 숨쉬는 곳입니다. 빠에야, 추로스, 감바스 등 특별한 음식들도 놓치지 마세요!" [ref=e613] [cursor=pointer]':
+            - /url: /promotion/plan/PM0066EC568F
+            - paragraph [ref=e615]: "2026-01 : 월간 여행지"
+            - paragraph [ref=e616]: 예술가들이 사랑한 나라, 스페인
+            - paragraph [ref=e617]:
+              - text: 연중 따뜻한 기후로 언제든 여행하기 좋은 스페인☀️
+              - text: 알함브라 궁전, 가우디 등 유명 건축물과
+              - text: 매혹적인 춤과 음악이 있는 플라멩코 공연,
+              - text: 스페인은 역사와 예술이 숨쉬는 곳입니다.
+              - text: 빠에야, 추로스, 감바스 등 특별한 음식들도 놓치지 마세요!
+          - list [ref=e618]:
+            - listitem [ref=e619]:
+              - 'link "스페인 일주 8,9일 #하나팩2.0 #NO추가경비 #루프탑레스토랑 3,599,000원~" [ref=e620] [cursor=pointer]':
+                - /url: /package/major-products?rprsProdCds=MES1003&sort=RPRS_SORT5
+                - paragraph [ref=e622]: 스페인 일주 8,9일
+                - paragraph [ref=e623]: "#하나팩2.0 #NO추가경비 #루프탑레스토랑"
+                - paragraph [ref=e624]:
+                  - strong [ref=e625]: 3,599,000원~
+            - listitem [ref=e626]:
+              - 'link "스페인/포르투갈 9~11일 #갓성비 #4성호텔 #스페인맛5 2,939,000원~" [ref=e627] [cursor=pointer]':
+                - /url: /package/major-products?rprsProdCds=MES1034&sort=RPRS_SORT5
+                - paragraph [ref=e629]: 스페인/포르투갈 9~11일
+                - paragraph [ref=e630]: "#갓성비 #4성호텔 #스페인맛5"
+                - paragraph [ref=e631]:
+                  - strong [ref=e632]: 2,939,000원~
+        - generic [ref=e635]:
+          - strong [ref=e637]: 내나라 구석구석
+          - list [ref=e638]:
+            - listitem [ref=e639]:
+              - link "하이원에서 만나는 설레는 겨울⛷️ 눈 내린 순간 하이원으로 겨울 레저 여행" [ref=e640] [cursor=pointer]:
+                - /url: "#"
+                - paragraph [ref=e642]:
+                  - text: 하이원에서 만나는
+                  - text: 설레는 겨울⛷️
+                - paragraph [ref=e643]:
+                  - text: 눈 내린 순간 하이원으로
+                  - text: 겨울 레저 여행
+            - listitem [ref=e644]:
+              - link "2026 설 연휴 출발🐴 설 연휴에 출발 가능한 추천여행부터 특가까지!" [ref=e645] [cursor=pointer]:
+                - /url: "#"
+                - paragraph [ref=e647]: 2026 설 연휴 출발🐴
+                - paragraph [ref=e648]:
+                  - text: 설 연휴에 출발 가능한
+                  - text: 추천여행부터 특가까지!
+            - listitem [ref=e649]:
+              - 'link "이달의 국내여행 겨울 방학 여행⛄ #눈꽃여행 #스키장 #온수풀 추천" [ref=e650] [cursor=pointer]':
+                - /url: "#"
+                - paragraph [ref=e652]: 이달의 국내여행
+                - paragraph [ref=e653]:
+                  - text: 겨울 방학 여행⛄
+                  - text: "#눈꽃여행 #스키장 #온수풀"
+                - generic [ref=e654]: 추천
+            - listitem [ref=e655]:
+              - link "계절의 끝을 담은, 겨울 국내 여행❄️ 패키지로 떠나는 겨울 축제 & 명소 여행" [ref=e656] [cursor=pointer]:
+                - /url: "#"
+                - paragraph [ref=e658]:
+                  - text: 계절의 끝을 담은,
+                  - text: 겨울 국내 여행❄️
+                - paragraph [ref=e659]:
+                  - text: 패키지로 떠나는
+                  - text: 겨울 축제 & 명소 여행
+            - listitem [ref=e660]:
+              - link "언제가도 특별한 섬, 제주도 패키지부터 자유여행까지! 단독 특가와 혜택은 덤🍊" [ref=e661] [cursor=pointer]:
+                - /url: "#"
+                - paragraph [ref=e663]: 언제가도 특별한 섬, 제주도
+                - paragraph [ref=e664]:
+                  - text: 패키지부터 자유여행까지!
+                  - text: 단독 특가와 혜택은 덤🍊
+        - generic [ref=e667]:
+          - strong [ref=e669]: 물놀이는 계절을 가리지 않아요.
+          - generic [ref=e670]:
+            - generic [ref=e671]:
+              - iframe [ref=e674]:
+                - generic "YouTube Video Player" [ref=f2e3]:
+                  - generic [ref=f2e5]:
+                    - link "Photo image of 하나투어" [ref=f2e8] [cursor=pointer]:
+                      - /url: https://www.youtube.com/channel/UCunNU27j6xGERWag1pOQxfg?embeds_referring_euri=https%3A%2F%2Fwww.hanatour.com%2F
+                    - link "세부 제이파크 아일랜드 최신정보 완벽하게 정리해줌!ㅣ폴더뷰📂" [ref=f2e11] [cursor=pointer]:
+                      - /url: https://www.youtube.com/watch?v=YjoZYz-KayM
+                    - button "More" [ref=f2e13] [cursor=pointer]:
+                      - generic [ref=f2e14]:
+                        - img
+                  - button "Play" [ref=f2e17] [cursor=pointer]:
+                    - img
+              - paragraph [ref=e675]: 아이 있는 집이면, 다 안다는 바로 그 곳!
+              - paragraph [ref=e676]:
+                - text: 입소문에는 이유가 있죠!
+                - text: 가족 모두가 만족하는 제이파크 아일랜드🛝
+                - text: 낱낱이 파헤쳐 드릴게요~
+              - link "영상 보고, 가고 싶다면 클릭! >" [ref=e677] [cursor=pointer]:
+                - /url: "#"
+            - generic [ref=e678]:
+              - link "지금 만나고 싶은 '물 만난 여행'을 골라보세요. 🤿 액티비티- 워터파크, 호핑투어, 카약킹 🏝️ 여유로운 휴양 - 해변, 리조트에서 휴식 ♨️ 뜨뜻한 온천 - 겨울 여행의 꽃 🚢 바다 위의 낭만 - 요트투어, 크루즈" [ref=e679] [cursor=pointer]:
+                - /url: "#"
+                - paragraph [ref=e680]: 지금 만나고 싶은 '물 만난 여행'을 골라보세요.
+                - paragraph [ref=e681]:
+                  - text: 🤿 액티비티- 워터파크, 호핑투어, 카약킹
+                  - text: 🏝️ 여유로운 휴양 - 해변, 리조트에서 휴식
+                  - text: ♨️ 뜨뜻한 온천 - 겨울 여행의 꽃
+                  - text: 🚢 바다 위의 낭만 - 요트투어, 크루즈
+              - link "고르셨나요? 그럼 다음 단계로 >" [ref=e682] [cursor=pointer]:
+                - /url: "#"
+            - generic [ref=e683]:
+              - link "세계 3대 다이빙 포인트 여행지 비행 5시간 거리의 신상 여행지로 거북이/열대어/돌고래를 만날 수 있고 시내 관광+휴양을 함께 즐길 수 있는 곳!" [ref=e684] [cursor=pointer]:
+                - /url: "#"
+                - paragraph [ref=e686]: 세계 3대 다이빙 포인트 여행지
+                - paragraph [ref=e687]:
+                  - text: 비행 5시간 거리의 신상 여행지로
+                  - text: 거북이/열대어/돌고래를 만날 수 있고
+                  - text: 시내 관광+휴양을 함께 즐길 수 있는 곳!
+              - link "어디인지 궁금하다면? >" [ref=e688] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e690]:
+          - strong [ref=e692]: 🎼쏠쏠한 혜택, 하나투어가 한 번 더 알려드려요~!
+          - list [ref=e694]:
+            - listitem [ref=e695] [cursor=pointer]:
+              - paragraph [ref=e696]: 삼성카드
+              - strong [ref=e697]: 하나투어 x 삼성카드 결제혜택
+            - listitem [ref=e698] [cursor=pointer]:
+              - paragraph [ref=e699]: 3대 면세 쇼핑 혜택
+              - strong [ref=e700]: 롯데/신라/신세계
+            - listitem [ref=e701] [cursor=pointer]:
+              - paragraph [ref=e702]: 인천 공항철도 할인 혜택
+              - strong [ref=e703]: 공항가는 길
+            - listitem [ref=e704] [cursor=pointer]:
+              - paragraph [ref=e705]: 3일 무료혜택
+              - strong [ref=e706]: 포켓 와이파이
+        - list [ref=e710]:
+          - listitem [ref=e711]:
+            - link "하나투어상품권" [ref=e712] [cursor=pointer]:
+              - /url: "#"
+              - text: 하나투어상품권
+          - listitem [ref=e714]:
+            - link "마일리지클럽" [ref=e715] [cursor=pointer]:
+              - /url: "#"
+              - text: 마일리지클럽
+          - listitem [ref=e717]:
+            - link "SAFETY&JOY" [ref=e718] [cursor=pointer]:
+              - /url: "#"
+              - text: SAFETY&JOY
+          - listitem [ref=e720]:
+            - link "하나LIVE" [ref=e721] [cursor=pointer]:
+              - /url: "#"
+              - text: 하나LIVE
+          - listitem [ref=e723]:
+            - link "제우스" [ref=e724] [cursor=pointer]:
+              - /url: "#"
+              - text: 제우스
+          - listitem [ref=e726]:
+            - link "맞춤여행" [ref=e727] [cursor=pointer]:
+              - /url: "#"
+              - text: 맞춤여행
+          - listitem [ref=e729]:
+            - link "하나트래비즈" [ref=e730] [cursor=pointer]:
+              - /url: "#"
+              - text: 하나트래비즈
+          - listitem [ref=e732]:
+            - link "외국인여행" [ref=e733] [cursor=pointer]:
+              - /url: "#"
+              - text: 외국인여행
+          - listitem [ref=e735]:
+            - link "이벤트" [ref=e736] [cursor=pointer]:
+              - /url: "#"
+              - text: 이벤트
+        - generic [ref=e739]:
+          - generic [ref=e742]:
+            - generic [ref=e743]:
+              - strong [ref=e745]:
+                - text: 하나투어닷컴
+                - text: 고객센터
+              - strong [ref=e746]: 1577-1233
+              - link "자주 찾는 질문" [ref=e747] [cursor=pointer]:
+                - /url: "#"
+              - link "ARS상담번호 안내" [ref=e748] [cursor=pointer]:
+                - /url: "#"
+            - generic [ref=e749]:
+              - list [ref=e750]:
+                - listitem [ref=e751]:
+                  - strong [ref=e752]: 해외여행 문의
+                  - list [ref=e753]:
+                    - listitem [ref=e754]: "연중무휴 : 09:00~20:00"
+                  - strong [ref=e755]: 해외항공권 문의
+                  - list [ref=e756]:
+                    - listitem [ref=e757]: 1899-1833
+                    - listitem [ref=e758]: "평일 : 09:00~17:00"
+                    - listitem [ref=e759]: (점심시간 12:00-13:00)
+              - list [ref=e760]:
+                - listitem [ref=e761]:
+                  - strong [ref=e762]: 국내여행 문의
+                  - list [ref=e763]:
+                    - listitem [ref=e764]: "평일 : 09:00~18:00"
+                  - strong [ref=e765]: 국내항공/국내숙박 문의
+                  - list [ref=e766]:
+                    - listitem [ref=e767]: "평일 : 09:00~18:00"
+                    - listitem [ref=e768]: "(점심시간 : 12:00~13:00)"
+                  - list [ref=e769]:
+                    - listitem [ref=e770]: "주말 : 10:00~16:00"
+                    - listitem [ref=e771]: "공휴일 : 10:00~14:00"
+                    - listitem [ref=e772]: "*주말/공휴일은 긴급 상담만 가능(업무처리 불가)"
+                  - strong [ref=e773]: 기업출장 / 교육여행 단체문의
+                  - list [ref=e774]:
+                    - listitem [ref=e775]: "평일 : 09:00~18:00"
+            - list [ref=e777]:
+              - listitem [ref=e778]:
+                - strong [ref=e779]: 상담번호 안내
+                - list [ref=e780]:
+                  - listitem [ref=e781]: 1번 예약상담 및 조회
+                  - listitem [ref=e782]: 2번 마일리지, 제휴카드, 상품권 및 기타문의
+                - strong [ref=e783]: 외국인한국여행 전용상담 02-398-6600
+                - strong [ref=e784]: 법인고객 전용상담 1566-0072
+                - strong [ref=e785]: 안심카드결제 ARS 1577-0015
+                - link "카드/제휴혜택" [ref=e786] [cursor=pointer]:
+                  - /url: "#"
+          - generic [ref=e788]:
+            - generic [ref=e789]:
+              - text: 매주 월요일 오전 10시
+              - strong [ref=e790]: 초특가 타임세일
+              - paragraph [ref=e791]: 쏟아지는 앱 전용 혜택을 놓치지 마세요!
+              - link "특가 & 혜택 받으러 가기" [ref=e792] [cursor=pointer]:
+                - /url: https://m.hanatour.com/dcr/promotion/plan/PM0067C86FE5
+            - generic [ref=e793]:
+              - text: QR코드를 스캔하고
+              - text: 하나투어 앱을
+              - text: 설치해 보세요!
+    - generic [ref=e796]:
+      - generic [ref=e797]:
+        - generic [ref=e798]:
+          - generic [ref=e800]:
+            - term [ref=e801]: 공지
+            - definition [ref=e802]:
+              - generic [ref=e804]:
+                - link "<하나투어X마이민> 나트랑 공구마켓 구매 이벤트 당첨자 안내" [ref=e805] [cursor=pointer]:
+                  - /url: "#"
+                - link "<하나LIVE> 26년 1월 21일 방송 -나트랑/달랏- 방송 구매 인증 이벤트 당첨자 안내" [ref=e806] [cursor=pointer]:
+                  - /url: "#"
+                - link "<하나LIVE> 26년 1월 21일 방송 -나트랑/달랏- 방송 퀴즈 이벤트 당첨자 안내" [ref=e807] [cursor=pointer]:
+                  - /url: "#"
+                - link "<하나LIVE> 26년 1월 20일 방송 -동남아 골프- 방송 구매 & 구독자 이벤트 당첨자 안내" [ref=e808] [cursor=pointer]:
+                  - /url: "#"
+                - link "<하나LIVE> 26년 1월 20일 방송 -동남아 골프- 방송 퀴즈 이벤트 당첨자 안내" [ref=e809] [cursor=pointer]:
+                  - /url: "#"
+                - link "<하나투어X마이민> 나트랑 공구마켓 구매 이벤트 당첨자 안내" [ref=e810] [cursor=pointer]:
+                  - /url: "#"
+                - link "<하나LIVE> 26년 1월 21일 방송 -나트랑/달랏- 방송 구매 인증 이벤트 당첨자 안내" [ref=e811] [cursor=pointer]:
+                  - /url: "#"
+              - link "더보기" [ref=e812] [cursor=pointer]:
+                - /url: "#"
+          - list [ref=e814]:
+            - listitem [ref=e815]:
+              - link "facebook" [ref=e816] [cursor=pointer]:
+                - /url: https://www.facebook.com/HanaTour.fb
+            - listitem [ref=e817]:
+              - link "instagram" [ref=e818] [cursor=pointer]:
+                - /url: https://www.instagram.com/hanatour_official
+            - listitem [ref=e819]:
+              - link "blog" [ref=e820] [cursor=pointer]:
+                - /url: https://blog.naver.com/hanatourkr
+            - listitem [ref=e821]:
+              - link "kakaoplus" [ref=e822] [cursor=pointer]:
+                - /url: https://pf.kakao.com/_ftrPI
+            - listitem [ref=e823]:
+              - link "youtube" [ref=e824] [cursor=pointer]:
+                - /url: https://www.youtube.com/user/HanaTour
+            - listitem [ref=e825]:
+              - link "kakaostory" [ref=e826] [cursor=pointer]:
+                - /url: https://story.kakao.com/#ch/hanatour
+        - generic [ref=e827]:
+          - generic [ref=e828]:
+            - list [ref=e829]:
+              - listitem [ref=e830]:
+                - link "회사소개" [ref=e831] [cursor=pointer]:
+                  - /url: https://www.hanatourcompany.com
+              - listitem [ref=e832]:
+                - link "이용약관" [ref=e833] [cursor=pointer]:
+                  - /url: /els/prv/CHPC0PRV0004M200
+              - listitem [ref=e834]:
+                - link "개인정보처리방침" [ref=e835] [cursor=pointer]:
+                  - /url: /els/prv/CHPC0PRV0005M200
+                  - strong [ref=e836]: 개인정보처리방침
+              - listitem [ref=e837]:
+                - link "여행약관" [ref=e838] [cursor=pointer]:
+                  - /url: /els/prv/CHPC0PRV0003M200
+              - listitem [ref=e839]:
+                - link "해외여행자보험" [ref=e840] [cursor=pointer]:
+                  - /url: /els/etc/CHPC0ETC0008M200
+              - listitem [ref=e841]:
+                - link "마케팅제휴" [ref=e842] [cursor=pointer]:
+                  - /url: /els/etc/CHPC0ETC0001M200
+              - listitem [ref=e843]:
+                - link "공식인증예약센터 검색" [ref=e844] [cursor=pointer]:
+                  - /url: /els/etc/CHPC0ETC0004M200
+            - generic [ref=e846]:
+              - generic [ref=e847]:
+                - strong [ref=e849]: (주)하나투어
+                - generic [ref=e850]: "대표 : 송미선"
+                - generic [ref=e851]: "주소 : (03161) 서울특별시 종로구 인사동 5길 41"
+              - paragraph [ref=e852]:
+                - generic [ref=e853]: "사업자등록번호 : 102-81-39440"
+                - link "사업자정보확인" [ref=e855] [cursor=pointer]:
+                  - /url: https://www.ftc.go.kr/bizCommPop.do?wrkr_no=1028139440
+                - generic [ref=e856]: "통신판매업신고번호 : 종로01-1806호"
+                - generic [ref=e857]: "관광사업자 등록번호 : 제1993-000006호"
+                - generic [ref=e858]: "등록관청 : 서울특별시 종로구청"
+              - paragraph [ref=e859]:
+                - generic [ref=e860]: "개인정보 보호책임자 : 전준형"
+                - generic [ref=e861]: 영업보증공제 15억 1천만원 가입 | 기획여행보증공제 7억원 가입
+                - generic [ref=e862]: "팩스: 02-734-0392"
+                - generic [ref=e863]:
+                  - text: "이메일 :"
+                  - link "15771233@hanatour.com" [ref=e864] [cursor=pointer]:
+                    - /url: mailto:15771233@hanatour.com
+              - paragraph [ref=e865]:
+                - strong [ref=e867]:
+                  - generic [ref=e868]: 고객센터
+                  - text: 1577-1233
+                - strong [ref=e869]:
+                  - generic [ref=e870]: 해외항공권문의
+                  - text: 1899-1833
+              - strong [ref=e871]:
+                - paragraph [ref=e872]:
+                  - text: ※ 부득이한 사정에 의해 여행일정이 변경되는 경우 사전 동의를 받습니다.
+                  - text: ※ 하나투어는 개별 항공권 및 일부 여행상품에 대하여 통신판매중개자의 지위를 가지며, 해당 상품의 정보 및 거래 등에 관한 책임은 판매자에게 있습니다.
+                  - text: ※ 예금주 하나투어가 아닌 계좌(개인, 대리점 등)로 입금하실 경우 당사에 대한 유효한 지급이 아니며, 당사는 책임지지 않습니다.
+                  - text: 하나투어 가상 계좌가 아닌 다른 계좌(개인, 대리점 등)에 대한 입금 유도가 있는 경우, 반드시 입금 전에 하나투어 고객센터로 문의 / 신고 하여 주시기 바랍니다.
+                - paragraph [ref=e873]: COPYRIGHTⓒ HANATOUR SERVICE INC. ALL RIGHTS RESERVED
+          - generic [ref=e876]:
+            - term [ref=e877]: 하나은행 구매안전 서비스
+            - definition [ref=e878]:
+              - text: 고객님은 안전거래를 위해 현금으로 결제시
+              - text: (주)하나투어에서 가입한 하나은행으로
+              - text: 구매안전서비스를 이용하실 수 있습니다.
+            - definition [ref=e879]:
+              - generic [ref=e880] [cursor=pointer]: 서비스 가입사실 확인
+      - generic [ref=e882]:
+        - generic [ref=e883]:
+          - generic [ref=e885]:
+            - group "7 / 14" [ref=e886]:
+              - img "로고" [ref=e888]
+              - text: 한국표준협회 선정
+              - text: 4년 연속(2019~2025)
+              - text: 한국서비스품질지수 여행사 부문 1위
+            - group "8 / 14" [ref=e889]:
+              - img "로고" [ref=e891]
+              - text: 한국능률협회선정
+              - text: 21년연속(2005~2025)
+              - text: 브랜드파워 1위
+            - group "9 / 14" [ref=e892]:
+              - img "로고" [ref=e894]
+              - text: 브랜드스탁선정
+              - text: 21년연속(2005~2025)
+              - text: 브랜드스타 1위
+            - group "10 / 14" [ref=e895]:
+              - img "로고" [ref=e897]
+              - text: 2025 대한민국 SNS 대상
+              - text: 업계 최초 관광 부문 대상
+            - group "5 / 14" [ref=e898]:
+              - img "로고" [ref=e900]
+              - text: 소비자중심경영(CCM)
+              - text: 7회 연속 인증(2012~2024) 및
+              - text: 2025년 ‘명예의 전당’ 포상
+            - group "6 / 14" [ref=e901]:
+              - img "로고" [ref=e903]
+              - text: KMAC 선정
+              - text: 14년 연속(2009~2025)
+              - text: 한국산업의 고객만족도 여행사부문 1위
+            - group "7 / 14" [ref=e904]:
+              - img "로고" [ref=e906]
+              - text: 한국표준협회 선정
+              - text: 4년 연속(2019~2025)
+              - text: 한국서비스품질지수 여행사 부문 1위
+            - group "8 / 14" [ref=e907]:
+              - img "로고" [ref=e909]
+              - text: 한국능률협회선정
+              - text: 21년연속(2005~2025)
+              - text: 브랜드파워 1위
+            - group "9 / 14" [ref=e910]:
+              - img "로고" [ref=e912]
+              - text: 브랜드스탁선정
+              - text: 21년연속(2005~2025)
+              - text: 브랜드스타 1위
+            - group "10 / 14" [ref=e913]:
+              - img "로고" [ref=e915]
+              - text: 2025 대한민국 SNS 대상
+              - text: 업계 최초 관광 부문 대상
+            - group "5 / 14" [ref=e916]:
+              - img "로고" [ref=e918]
+              - text: 소비자중심경영(CCM)
+              - text: 7회 연속 인증(2012~2024) 및
+              - text: 2025년 ‘명예의 전당’ 포상
+            - group "6 / 14" [ref=e919]:
+              - img "로고" [ref=e921]
+              - text: KMAC 선정
+              - text: 14년 연속(2009~2025)
+              - text: 한국산업의 고객만족도 여행사부문 1위
+            - group "7 / 14" [ref=e922]:
+              - img "로고" [ref=e924]
+              - text: 한국표준협회 선정
+              - text: 4년 연속(2019~2025)
+              - text: 한국서비스품질지수 여행사 부문 1위
+            - group "8 / 14" [ref=e925]:
+              - img "로고" [ref=e927]
+              - text: 한국능률협회선정
+              - text: 21년연속(2005~2025)
+              - text: 브랜드파워 1위
+          - button "Previous slide" [ref=e928] [cursor=pointer]: 이전보기
+          - button "Next slide" [ref=e929] [cursor=pointer]: 다음보기
+        - list [ref=e930]:
+          - listitem [ref=e931]:
+            - link "korea brand awards 대한민국브랜드대상" [ref=e932]:
+              - /url: "#none_link"
+              - generic [ref=e933]:
+                - img "korea brand awards" [ref=e934]
+                - text: 대한민국브랜드대상
+          - listitem [ref=e935]:
+            - link "mark 국외여행상품 정보제공 표준안 참여여행사" [ref=e936] [cursor=pointer]:
+              - /url: http://tourinfo.or.kr/standard/standard_01.asp
+              - img "mark" [ref=e938]
+              - text: 국외여행상품 정보제공 표준안 참여여행사
+          - listitem [ref=e939]:
+            - generic [ref=e940] [cursor=pointer]:
+              - img "mark" [ref=e942]
+              - text: 개인정보보호우수사이트
+          - listitem [ref=e943]:
+            - link "mark CCM" [ref=e944] [cursor=pointer]:
+              - /url: https://www.hanatourcompany.com/kr/company/overview/service-identity
+              - img "mark" [ref=e946]
+              - text: CCM
+          - listitem [ref=e947]:
+            - link "mark ISMS 인증 취득" [ref=e948] [cursor=pointer]:
+              - /url: /com/cuc/CHPC0CUC0005M200?curPage=1&postNum=1462&selectTab=all&srchKey=TIT&srchTxt
+              - img "mark" [ref=e950]
+              - text: ISMS 인증 취득
+          - listitem [ref=e951]:
+            - link "cash receipt 현금영수증 의무발행 가맹점" [ref=e952] [cursor=pointer]:
+              - /url: /com/cuc/CHPC0CUC0005M200?postNum=1887&selectTab=1&srchKey=&srchTxt
+              - img "cash receipt" [ref=e954]
+              - text: 현금영수증 의무발행 가맹점
+  - generic [ref=e958]:
+    - generic [ref=e959]:
+      - generic [ref=e960]:
+        - group "4 / 5" [ref=e961] [cursor=pointer]
+        - group "2 / 5" [ref=e962] [cursor=pointer]
+        - group "3 / 5" [ref=e963] [cursor=pointer]
+        - group "4 / 5" [ref=e964] [cursor=pointer]
+        - group "2 / 5" [ref=e965] [cursor=pointer]
+      - paragraph [ref=e966]
+      - generic [ref=e967]:
+        - button "Go to slide 1" [ref=e968] [cursor=pointer]
+        - button "Go to slide 2" [ref=e969] [cursor=pointer]
+        - button "Go to slide 3" [ref=e970] [cursor=pointer]
+    - generic [ref=e971]:
+      - generic:
+        - button "오늘은 그만보기" [ref=e972] [cursor=pointer]
+        - button "닫기" [ref=e973] [cursor=pointer]
+```

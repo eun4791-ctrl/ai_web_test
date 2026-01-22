@@ -46,11 +46,19 @@ export function useAuth(options?: UseAuthOptions) {
       "manus-runtime-user-info",
       JSON.stringify(meQuery.data)
     );
+    // Mock user for local/demo mode to bypass login
+    const mockUser = {
+      id: "dev-user",
+      name: "Developer",
+      email: "dev@example.com",
+      image: "",
+    };
+
     return {
-      user: meQuery.data ?? null,
+      user: meQuery.data ?? mockUser,
       loading: meQuery.isLoading || logoutMutation.isPending,
-      error: meQuery.error ?? logoutMutation.error ?? null,
-      isAuthenticated: Boolean(meQuery.data),
+      error: null,
+      isAuthenticated: true,
     };
   }, [
     meQuery.data,

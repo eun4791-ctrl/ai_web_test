@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 // GitHub 토큰이 없으면 경고
 if (!process.env.GITHUB_TOKEN && process.env.NODE_ENV === "production") {
   console.warn("[WARNING] GITHUB_TOKEN environment variable is not set");
@@ -14,4 +17,6 @@ export const ENV = {
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   githubToken: process.env.GITHUB_TOKEN ?? "",
   openaiApiKey: process.env.OPENAI_API_KEY ?? "",
+  openaiModel: process.env.OPENAI_MODEL ?? "gpt-4o",
+  mcpHeadless: process.env.MCP_HEADLESS === "false",
 };
